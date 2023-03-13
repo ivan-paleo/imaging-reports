@@ -32,7 +32,7 @@ ui <- fluidPage(
           tableOutput("general_set"),
           tableOutput("acq_set"),
           tableOutput("proc_set"),
-          downloadButton("downloadReport", "Download Report"))
+          downloadButton("download", "Download Report"))
         )
       )
     )
@@ -45,10 +45,12 @@ server <- function(input, output) {
     if (input$instrument == "Smartzoom 5") {
       soft <- c("Smartzoom", "ZEN core")
       acq_modes <- c("2D", "EDF", "3D", "Stitching")
+      assign("setup", "Steel table on solid concrete base", envir = .GlobalEnv)
     }
     if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT") {
       soft <- c("ZEN blue", "ZEN core")
       acq_modes <- c("3D Topography", "EDF", "Stitching")
+      assign("setup", "Passive anti-vibration table on solid concrete base", envir = .GlobalEnv)
     }
     tagList(
       selectInput("software", "Software", soft),
@@ -67,9 +69,9 @@ server <- function(input, output) {
                   "Last topography correction for used objectives",
                   "Last control for used objectives with the roughness standard (nominal Ra = 0.40 ± 0.05 µm)"),
       Value = c(input$name, "Carl Zeiss Microscopy GmbH", input$instrument, "IMPALA, MONREPOS, Germany",
-                "-1 (basement)", "Passive anti-vibration table on solid concrete base",
-                paste0(input$software, input$version, ", Shuttle-and-Find: ",  input$sf),
-                paste(acq_mode, collapse = ", "),
+                "-1 (basement)", setup,
+                paste0(input$software, " ", input$version, ", Shuttle-and-Find: ",  input$sf),
+                paste(input$acq_mode, collapse = ", "),
                 "2022-10-11", "2022-10-11", "2021-12-22")
     )
   })
@@ -89,8 +91,8 @@ server <- function(input, output) {
       paste0("report_", input$name, Sys.Date(), ".ods")
     },
     content = function(file){
-      write_ods(report_general(), file, sheet = "General settings")
-      #write_ods(output$abbr, file, sheet = "Abbreviations", append = TRUE)
+      readODS::write_ods(report_general(), file, sheet = "General_settings")
+      #readODS::write_ods(output$abbr, file, sheet = "Abbreviations", append = TRUE)
     }
   )
 }
