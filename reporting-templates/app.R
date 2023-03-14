@@ -3,7 +3,7 @@
 
 # Load libraries
 library(shiny)
-library(readODS)
+library(writexl)
 #library(shinyforms)
 
 # Define UI
@@ -32,7 +32,7 @@ ui <- fluidPage(
           tableOutput("general_set"),
           tableOutput("acq_set"),
           tableOutput("proc_set"),
-          downloadButton("download", "Download Report"))
+          downloadButton("downloadReport", "Download Report"))
         )
       )
     )
@@ -61,14 +61,15 @@ server <- function(input, output) {
   })
   report_general <- reactive({
     data.frame(
-      Category = c("User", "Microscope", "Microscope", "Location", "Location", "Location", "Software",
-                   "Acquisition modes", "Maintenance", "Maintenance", "Maintenance"),
+      Category = c("User", "Microscope", "Microscope", "Location", "Location", "Location",
+                   "Software", "Acquisition modes", "Maintenance", "Maintenance", "Maintenance"),
       Setting = c("Name", "Manufacturer", "Model", "Facility", "Floor", "Setup",
                   "Software, version and modules", "",
                   "Last yearly inspection and calibration by manufacturer",
                   "Last topography correction for used objectives",
                   "Last control for used objectives with the roughness standard (nominal Ra = 0.40 ± 0.05 µm)"),
-      Value = c(input$name, "Carl Zeiss Microscopy GmbH", input$instrument, "IMPALA, MONREPOS, Germany",
+      Value = c(input$name, "Carl Zeiss Microscopy GmbH", input$instrument,
+                "IMPALA, MONREPOS, Germany",
                 "-1 (basement)", setup,
                 paste0(input$software, " ", input$version, ", Shuttle-and-Find: ",  input$sf),
                 paste(input$acq_mode, collapse = ", "),
@@ -79,20 +80,23 @@ server <- function(input, output) {
     report_general()
   })
 
-  output$abbr <- renderTable({
+  report_abbr <- reactive({
     data.frame(Abbreviation = c("AU", "HF", "LSM", "NA", "WD", "WF"),
                Explanation = c("Airy unit", "Hot fix", "Laser-scanning confocal microscopy",
                                "Numerical aperture", "Working distance", "Wide-field")
     )
   })
+  output$abbr <- renderTable({
+    report_abbr()
+  })
 
-  output$report <- downloadHandler(
+  output$downloadReport <- downloadHandler(
     filename = function() {
-      paste0("report_", input$name, Sys.Date(), ".ods")
+      paste("report_", gsub(" ", "-", input$name), "_", Sys.Date(), ".xlsx", sep = "")
     },
     content = function(file){
-      readODS::write_ods(report_general(), file, sheet = "General_settings")
-      #readODS::write_ods(output$abbr, file, sheet = "Abbreviations", append = TRUE)
+      writexl::write_xlsx(list(General_settings = report_general(), Abbreviations = report_abbr()),
+                          file)
     }
   )
 }
