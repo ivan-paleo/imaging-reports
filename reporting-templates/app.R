@@ -43,8 +43,11 @@ ui <- fluidPage(
         tabPanel("Export report", fluidRow(
 
           # Shows the result of the user input in tables
+          h2("General settings"),
           tableOutput("general_set"),
+          h2("Acquisition settings"),
           tableOutput("acq_set"),
+          h2("Pre-processing settings"),
           tableOutput("proc_set"),
 
           # Add a button to download the report
@@ -127,6 +130,56 @@ server <- function(input, output) {
   output$general_set <- renderTable({
     report_general()
   })
+
+
+  # Render tab 'Acquisition'
+  output$acq <- renderUI({
+
+    # create objects with different values depending on the instrument
+    if (input$instrument == "Smartzoom 5") {
+      objectives <- paste0("PlanApoD ", c(1.6, 5), "x / NA = ", c(0.1, 0.3), " / WD = ", c(36, 30), " mm")
+      obj_use <- "Color image"
+
+      # Must be assigned to global environment so that it can be used outside of renderUI()
+      # and inside 'report_acq'
+      #assign("setup", "Steel table on solid concrete base", envir = .GlobalEnv)
+    }
+
+    if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT") {
+      objectives <- paste0("C Epiplan-Apochromat ", c(5, 10, 20, 20, 50, 50, 50), "x / NA = ",
+                           format(c(0.20, 0.40, 0.22, 0.70, 0.55, 0.75, 0.95), digits = 2), " / WD = ",
+                           c(21, 5.4, 12, 1.3, 9, 1, 0.22)," mm")
+      obj_use <- c("Preview scan", "Coordinate system", "Color image", "3D topography")
+    }
+
+    # Create a list of inputs
+    tagList(
+
+      # Selection box to select the software used, possible values come from 'soft'
+      #selectInput("software", "Software", soft),
+
+      # Input text for software version
+      #textInput("version", "Software version", "2.6 HF 12"),
+
+      # Check box whether Shuttle-and-Find module was used
+      #checkboxInput("sf", "Shuttle-and-Find module used", FALSE),
+
+      # Check boxes to select which objective(s) was (were) used
+      # Possible values come from 'objectives'
+      # Does not work yet - ideally a table of checkboxes
+      fluidRow(
+        #for (i in objectives) {
+          column(4, paste(objectives, sep = "\n", collapse = "\n")),
+          column(2, checkboxGroupInput("preview", "Preview scan", rep(" ", length(objectives)))),
+          column(2, checkboxGroupInput("coord", "Coordinate system", rep(" ", length(objectives)))),
+          column(2, checkboxGroupInput("colo", "Color image", rep(" ", length(objectives)))),
+          column(2, checkboxGroupInput("topo", "3D topography", rep(" ", length(objectives))))
+        #}
+        #checkboxGroupInput("objs", "Objectives", objectives, width = "100%")
+      )
+    )
+  })
+
 
   # Create output for abbreviations
   # 'reactive()' is necessary to export it
