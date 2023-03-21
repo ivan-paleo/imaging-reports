@@ -1,14 +1,19 @@
 # Shiny app to enter the settings of acquisitions at the IMPALA
 # Download the settings in an editable (XLSX) report
+# Written by Ivan Calandra
+
 
 #####
+
 
 # 1. Load libraries
 library(shiny)
 library(writexl)
 #library(shinyforms)
 
+
 #####
+
 
 # 2. Define UI
 ui <- fluidPage(
@@ -66,10 +71,13 @@ ui <- fluidPage(
   )
 )
 
-#####
+
+####
+
 
 # 3. Define server logic
 server <- function(input, output) {
+
 
   # 3.1. Tab General
   # 3.1.1. Render tab 'general'
@@ -117,6 +125,7 @@ server <- function(input, output) {
     )
   })
 
+
   # 3.1.2 Create output for general settings
   # 'reactive()' is necessary to use input values from above and to export it
   report_general <- reactive({
@@ -137,10 +146,13 @@ server <- function(input, output) {
     rbind(temp, maintenance)
   })
 
+
   # 3.1.3. Render output for general settings in the tab "Export report" in the table 'general_set'
   output$general_set <- renderTable({
     report_general()
   })
+
+
 
 
   # 3.2. Tab Objectives
@@ -162,12 +174,13 @@ server <- function(input, output) {
     # Create a list of inputs
     tagList(
       h2("Specify how you used each objective"),
-      h4("Make sure to select 'Not used' for the objectives you have not used"),
+      h4("Make sure to select 'Not used' for the objective(s) you have not used"),
       lapply(seq_along(objectives), function(i) {
         selectInput(paste0("obj", i), objectives[i], choices = obj_use, width = "100%", multiple = TRUE)
       })
     )
   })
+
 
   # 3.2.2. Create output for objective settings
   # 'reactive()' is necessary to use input values from above and to export it
@@ -182,10 +195,13 @@ server <- function(input, output) {
     temp <- temp[temp$Use != "Not used", ]
   })
 
+
   # 3.2.3. Render output for general settings in the tab "Export report" in the table 'general_set'
   output$obj_set <- renderTable({
     report_obj()
   })
+
+
 
 
   # 3.5. Tab Abbreviations
@@ -200,10 +216,13 @@ server <- function(input, output) {
     )
   })
 
+
   # 3.5.2. Render output for abbreviations in the tab "Abbreviations" in the table 'abbr'
   output$abbr <- renderTable({
     report_abbr()
   })
+
+
 
 
   # 3.6. Define what happens when one clicks on the download button
@@ -224,7 +243,9 @@ server <- function(input, output) {
   )
 }
 
+
 #####
+
 
 # 4. Run the application
 shinyApp(ui = ui, server = server)
