@@ -51,7 +51,7 @@ ui <- fluidPage(
         tabPanel("Abbreviations", tableOutput("abbr")),
 
         # Tab "Export report"
-        tabPanel("Export report", fluidRow(
+        tabPanel("Report", fluidRow(
 
           # Shows the result of the user input in tables
           h2("General settings"),
@@ -147,7 +147,7 @@ server <- function(input, output) {
   })
 
 
-  # 3.1.3. Render output for general settings in the tab "Export report" in the table 'general_set'
+  # 3.1.3. Render output for general settings in the tab "Report" in the table 'general_set'
   output$general_set <- renderTable({
     report_general()
   })
@@ -159,7 +159,6 @@ server <- function(input, output) {
   # 3.2.1. Render tab 'obj'
   output$obj <- renderUI({
 
-    # create objects with different values depending on the instrument
     if (input$instrument == "Smartzoom 5") {
       assign("objectives", paste0("PlanApoD ", c(1.6, 5), "x / NA = ", c(0.1, 0.3), " / WD = ", c(36, 30), " mm"), envir = .GlobalEnv)
       obj_use <- c("Color image", "Not used")
@@ -171,10 +170,9 @@ server <- function(input, output) {
       obj_use <- c("Preview scan", "Coordinate system", "Color image", "3D topography", "Not used")
     }
 
-    # Create a list of inputs
     tagList(
       h2("Specify how you used each objective"),
-      h4("Make sure to select 'Not used' for the objective(s) you have not used"),
+      h5("Make sure to select 'Not used' for the objective(s) you have not used"),
       lapply(seq_along(objectives), function(i) {
         selectInput(paste0("obj", i), objectives[i], choices = obj_use, width = "100%", multiple = TRUE)
       })
@@ -183,11 +181,7 @@ server <- function(input, output) {
 
 
   # 3.2.2. Create output for objective settings
-  # 'reactive()' is necessary to use input values from above and to export it
   report_obj <- reactive({
-
-    # Create data.frame() with information to include in the report
-    # Some information is user input, other is pre-defined
     temp <- data.frame(
       Objective = objectives,
       Use = sapply(seq_along(objectives), function(i) paste(input[[paste0('obj', i)]], collapse = ", "))
@@ -196,10 +190,67 @@ server <- function(input, output) {
   })
 
 
-  # 3.2.3. Render output for general settings in the tab "Export report" in the table 'general_set'
+  # 3.2.3. Render output for objective settings in the tab "Report" in the table 'obj_set'
   output$obj_set <- renderTable({
     report_obj()
   })
+
+
+
+
+  # 3.4. Tab Pre-processing
+  # 3.4.1. Render tab 'proc'
+  output$proc <- renderUI({
+
+    if (input$instrument == "Smartzoom 5") {
+      assign("edf_set", "Number of slices", envir = .GlobalEnv)
+      assign("edf_set_val", "NumberSlices", envir = .GlobalEnv)
+      edf_info <- function(x) numericInput(edf_set_val[x], edf_set[x], min = 1, value = 50)
+
+      assign("stitch_set", c("Blending", "Stitching Options"), envir = .GlobalEnv)
+      assign("stitch_set_val", list(stitch_blend = c("On", "Off"),
+                                    stitch_opt = c("Pixel", "Stage"),
+                                    envir = .GlobalEnv))
+    }
+
+    if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT") {
+      assign("edf_set", c("Method", "Z-Stack alignment"), envir = .GlobalEnv)
+      assign("edf_set_val", list(edf_method = c("Wavelets", "Contrast", "Maximum Projection", "Variance"),
+                                 edf_alignment = c("No alignment", "Normal", "High", "Highest")), envir = .GlobalEnv)
+      edf_info <- function(x) selectInput(names(edf_set_val)[x], edf_set[x], choices = edf_set_val[[x]])
+
+      assign("stitch_set", c("Fuse tiles", "Correct shading", "Edge Detector",
+                             "Comparer", "Global Optimizer"), envir = .GlobalEnv)
+
+      # To DO: add numericInput() somehow for minimal overlap and maximal shift
+      #"Minimal Overlap", "Maximal Shift",
+
+      assign("stitch_set_val", list(stitch_fuse = c("Activated", "Deactived"),
+                                    stitch_shading = c("Activated (Automatic)", "Activated (Reference)", "Deactivated"),
+                                    stitch_edge = c("Yes", "No"),
+                                    stitch_comp = c("Optimized", "Best", "Basic"),
+                                    stitch_optim = c("Best", "Basic"),
+                                    envir = .GlobalEnv))
+    }
+
+    tagList(
+      h2("EDF/3D (WF)"),
+      lapply(seq_along(edf_set), function(i) edf_info(i)),
+      h2("Stitching (WF)"),
+      lapply(seq_along(stitch_set), function(i) {
+        selectInput(names(stitch_set_val)[i], stitch_set[i], choices = stitch_set_val[[i]])
+      }),
+      h2("3D Topography (LSM)")
+      # TO DO
+    )
+  })
+
+
+  # 3.4.2. Create output for pre-processing settings
+  # TO DO
+
+  # 3.4.3. Render output for pre-processing settings in the tab "Report" in the table 'proc_set'
+  # TO DO
 
 
 
