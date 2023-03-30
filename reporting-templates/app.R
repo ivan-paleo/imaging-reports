@@ -91,7 +91,7 @@ server <- function(input, output) {
       # Must be assigned to global environment so that it can be used outside of renderUI()
       # and inside 'report_general'
       assign("setup", "Steel table on solid concrete base", envir = .GlobalEnv)
-      assign("maintenance", data.frame(Category = "Maintenance", Setting = "", Value = "NA"),
+      assign("maintenance", data.frame(Category = "Maintenance", Setting = "NA", Value = "NA"),
              envir = .GlobalEnv)
     }
     if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT") {
@@ -173,7 +173,12 @@ server <- function(input, output) {
     tagList(
       h2("Specify how you used each objective"),
       h5("Make sure to select 'Not used' for the objective(s) you have not used"),
+
+      # loop through all objectives
       lapply(seq_along(objectives), function(i) {
+
+        # for each objective, with labels taken from 'objectives',
+        # select use from 'obj_use' and store the value into 'input[[paste0("obj",i)]]', which parses to e.g. "input$obj1"
         selectInput(paste0("obj", i), objectives[i], choices = obj_use, width = "100%", multiple = TRUE)
       })
     )
@@ -186,6 +191,8 @@ server <- function(input, output) {
       Objective = objectives,
       Use = sapply(seq_along(objectives), function(i) paste(input[[paste0('obj', i)]], collapse = ", "))
     )
+
+    # Exclude unused objectives from the report
     temp <- temp[temp$Use != "Not used", ]
   })
 
@@ -203,17 +210,19 @@ server <- function(input, output) {
   output$proc <- renderUI({
 
     if (input$instrument == "Smartzoom 5") {
+      assign("edf_title", "EDF/3D (WF)", envir = .GlobalEnv)
       assign("edf_set", "Number of slices", envir = .GlobalEnv)
-      assign("edf_set_val", "NumberSlices", envir = .GlobalEnv)
-      edf_info <- function(x) numericInput(edf_set_val[x], edf_set[x], min = 1, value = 50)
+      assign("edf_set_val", list(edf_num_slices = "NumberSlices"), envir = .GlobalEnv)
+      edf_info <- function(x) sliderInput(names(edf_set_val)[x], edf_set[x], min = 1, max = 200, value = c(50, 60))
 
       assign("stitch_set", c("Blending", "Stitching Options"), envir = .GlobalEnv)
       assign("stitch_set_val", list(stitch_blend = c("On", "Off"),
-                                    stitch_opt = c("Pixel", "Stage"),
-                                    envir = .GlobalEnv))
+                                    stitch_opt = c("Pixel", "Stage")),
+                                    envir = .GlobalEnv)
     }
 
     if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT") {
+      assign("edf_title", "EDF (WF)", envir = .GlobalEnv)
       assign("edf_set", c("Method", "Z-Stack alignment"), envir = .GlobalEnv)
       assign("edf_set_val", list(edf_method = c("Wavelets", "Contrast", "Maximum Projection", "Variance"),
                                  edf_alignment = c("No alignment", "Normal", "High", "Highest")), envir = .GlobalEnv)
@@ -221,36 +230,75 @@ server <- function(input, output) {
 
       assign("stitch_set", c("Fuse tiles", "Correct shading", "Edge Detector",
                              "Comparer", "Global Optimizer"), envir = .GlobalEnv)
-
-      # To DO: add numericInput() somehow for minimal overlap and maximal shift
-      #"Minimal Overlap", "Maximal Shift",
-
       assign("stitch_set_val", list(stitch_fuse = c("Activated", "Deactived"),
                                     stitch_shading = c("Activated (Automatic)", "Activated (Reference)", "Deactivated"),
                                     stitch_edge = c("Yes", "No"),
                                     stitch_comp = c("Optimized", "Best", "Basic"),
-                                    stitch_optim = c("Best", "Basic"),
-                                    envir = .GlobalEnv))
+                                    stitch_optim = c("Best", "Basic")),
+                                    envir = .GlobalEnv)
     }
 
     tagList(
-      h2("EDF/3D (WF)"),
+      h2(edf_title),
+
+      # The different microscopes need different types of input (slider vs. select)
+      # So custom function 'edf_info()' created in renderUI() above
+      # Use 'edf_info()' in a loop to render input widget
       lapply(seq_along(edf_set), function(i) edf_info(i)),
+
       h2("Stitching (WF)"),
       lapply(seq_along(stitch_set), function(i) {
         selectInput(names(stitch_set_val)[i], stitch_set[i], choices = stitch_set_val[[i]])
       }),
-      h2("3D Topography (LSM)")
-      # TO DO
+
+      # Only one widget can be rendered within an 'if' call (because of the comma at the end of the widget call?)
+      if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT") {
+        numericInput("stitch_overlap", "Minimal Overlap [%]", min = 0, max = 100, value = 5)
+      },
+      if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT") {
+        numericInput("stitch_shift", "Maximal Shift [%]", min = 0, max = 100, value = 10)
+      },
+      if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT") h2("3D Topography (LSM)"),
+      if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT") {
+        numericInput("topo_noise_low", "Data quality - Noise cut: lowest level", min = 0, max = 65335, value = 0)
+      },
+      if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT") {
+        numericInput("topo_noise_high", "Data quality - Noise cut: highest level", min = 0, max = 65335, value = 65335)
+      }
     )
   })
 
 
   # 3.4.2. Create output for pre-processing settings
-  # TO DO
+  report_proc <- reactive({
+
+    # Not all settings are relevant for all microscopes, so output data.frames must be put together differently
+    if (input$instrument == "Smartzoom 5") {
+      temp <- data.frame(
+        Category = c(rep(edf_title, length(edf_set)), rep("Stitching (WF)", length(stitch_set))),
+        Setting = c(edf_set, stitch_set),
+        Value = c(sapply(seq_along(edf_set_val), function(i) paste(input[[names(edf_set_val)[i]]], collapse = "-")),
+                sapply(seq_along(stitch_set_val), function(i) input[[names(stitch_set_val)[i]]]))
+      )
+
+    # Only one 'if' call possible within 'reactive()', so 'if... else' was chosen
+    # Nested 'if... else' might be needed when more than 2 instruments are available
+    } else {
+      temp <- data.frame(
+        Category = c(rep(edf_title, length(edf_set)), rep("Stitching (WF)", length(stitch_set) + 2), "Topography (LSM)"),
+        Setting = c(edf_set, stitch_set, "Minimal Overlap [%]", "Maximal Shift [%]", "Data quality (Noise Cut)"),
+        Value = c(sapply(seq_along(edf_set_val), function(i) input[[names(edf_set_val)[i]]]),
+                  sapply(seq_along(stitch_set_val), function(i) input[[names(stitch_set_val)[i]]]),
+                  input$stitch_overlap, input$stitch_shift, paste0(input$topo_noise_low, "-", input$topo_noise_high, " levels"))
+      )
+    }
+  })
+
 
   # 3.4.3. Render output for pre-processing settings in the tab "Report" in the table 'proc_set'
-  # TO DO
+  output$proc_set <- renderTable({
+    report_proc()
+  })
 
 
 
@@ -289,7 +337,8 @@ server <- function(input, output) {
     content = function(file){
 
       # Write to XLSX, each table in a sheet
-      writexl::write_xlsx(list(General_settings = report_general(), Objectives = report_obj(), Abbreviations = report_abbr()), file)
+      writexl::write_xlsx(list(General_settings = report_general(), Objectives = report_obj(), Pre_processing = report_proc(),
+                               Abbreviations = report_abbr()), file)
     }
   )
 }
