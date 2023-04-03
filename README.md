@@ -103,6 +103,10 @@ There are two ways to get the App:
 **Enter your name and select the instrument you used from the list.**  
 Start again at the tab "General" if you switch to another instrument.
 
+><p align="center">
+>    <img src="screenshots/app_sidebar.png"><br>
+>    <i>Side bar</i>
+></p>
 
 ## Tab "General"
 **Select the software you used from the list and enter the version(s).**  
