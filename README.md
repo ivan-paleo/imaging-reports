@@ -67,7 +67,19 @@ There are two ways to get the App:
 
 ><figure><img src="screenshots/open_app.png"/><figcaption align="center"><i>Open the App from within RStudio.</i></figcaption></figure>
 
->![*Open the App from within RStudio.*](screenshots/open_app.png)
+>![](screenshots/open_app.png)  
+><p style="text-align: center;"><i>Open the App from within RStudio.</i></p>
+
+><p align="center" width="100%">
+>    <img src="screenshots/open_app.png"><br>
+>    <i>Open the App from within RStudio.</i>
+></p>
+
+<p align="center" width="100%">
+    <img src="screenshots/open_app.png"><br>
+    <i>Open the App from within RStudio.</i>
+</p>
+
 
 3.  Run the App by clicking on the button `Run App` in the top right corner.
 
