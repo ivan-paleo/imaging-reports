@@ -96,7 +96,7 @@ server <- function(input, output) {
     }
     if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT") {
       soft <- c("ZEN blue", "ZEN core")
-      acq_modes <- c("3D Topography", "EDF", "Stitching")
+      acq_modes <- c("2D", "3D Topography", "EDF", "Stitching")
       assign("setup", "Passive anti-vibration table on solid concrete base", envir = .GlobalEnv)
       assign("maintenance", data.frame(Category = rep("Maintenance", 3),
                                        Setting = c("Last yearly inspection and calibration by manufacturer",
@@ -111,10 +111,10 @@ server <- function(input, output) {
     tagList(
 
       # Selection box to select the software used, possible values come from 'soft'
-      selectInput("software", "Software", soft),
+      selectInput("software", "Software", soft, multiple = TRUE),
 
       # Input text for software version
-      textInput("version", "Software version", "2.6 HF 12"),
+      textInput("version", "Software version", "v2.6 HF12"),
 
       # Check box whether Shuttle-and-Find module was used
       checkboxInput("sf", "Shuttle-and-Find module used", FALSE),
@@ -130,6 +130,10 @@ server <- function(input, output) {
   # 'reactive()' is necessary to use input values from above and to export it
   report_general <- reactive({
 
+    paste_ver <- unlist(strsplit(input$version, ";"))
+    paste_sf <- paste0(", Shuttle-and-Find: ",  input$sf)
+    soft_out <- paste0(paste(input$software, paste_ver, collapse = ", "), paste_sf)
+
     # Create data.frame() with information to include in the report
     # Some information is user input, other is pre-defined
     temp <- data.frame(
@@ -140,7 +144,7 @@ server <- function(input, output) {
       Value = c(input$name, "Carl Zeiss Microscopy GmbH", input$instrument,
                 "IMPALA, MONREPOS, Germany",
                 "-1 (basement)", setup,
-                paste0(input$software, " ", input$version, ", Shuttle-and-Find: ",  input$sf),
+                soft_out,
                 paste(input$acq_mode, collapse = ", "))
     )
     rbind(temp, maintenance)
@@ -162,12 +166,16 @@ server <- function(input, output) {
     if (input$instrument == "Smartzoom 5") {
       assign("objectives", paste0("PlanApoD ", c(1.6, 5), "x / NA = ", c(0.1, 0.3), " / WD = ", c(36, 30), " mm"), envir = .GlobalEnv)
       obj_use <- c("Color image", "Not used")
+      sel_multi <- FALSE
+      sel_value <- "Not used"
     }
     if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT") {
       assign("objectives", paste0("C Epiplan-Apochromat ", c(5, 10, 20, 20, 50, 50, 50), "x / NA = ",
                            format(c(0.20, 0.40, 0.22, 0.70, 0.55, 0.75, 0.95), digits = 2), " / WD = ",
                            c(21, 5.4, 12, 1.3, 9, 1, 0.22)," mm"), envir = .GlobalEnv)
       obj_use <- c("Preview scan", "Coordinate system", "Color image", "3D topography", "Not used")
+      sel_multi <- TRUE
+      sel_value <- NULL
     }
 
     tagList(
@@ -179,7 +187,8 @@ server <- function(input, output) {
 
         # for each objective, with labels taken from 'objectives',
         # select use from 'obj_use' and store the value into 'input[[paste0("obj",i)]]', which parses to e.g. "input$obj1"
-        selectInput(paste0("obj", i), objectives[i], choices = obj_use, width = "100%", multiple = TRUE)
+        selectInput(paste0("obj", i), objectives[i], choices = obj_use,
+                    width = "100%", multiple = sel_multi, selected = sel_value)
       })
     )
   })
