@@ -65,35 +65,24 @@ There are two ways to get the App:
 1.  Open the file [reporting-templates.Rproj](reporting-templates.Rproj) with RStudio.
 2.  Open the file `reporting-templates/app.R` from within RStudio by clicking on it in the `Files` panel.
 
-><figure><img src="screenshots/open_app.png"/><figcaption align="center"><i>Open the App from within RStudio.</i></figcaption></figure>
-
->![](screenshots/open_app.png)  
-><p style="text-align: center;"><i>Open the App from within RStudio.</i></p>
-
 ><p align="center" width="100%">
 >    <img src="screenshots/open_app.png"><br>
 >    <i>Open the App from within RStudio.</i>
 ></p>
 
-<p align="center" width="100%">
-    <img src="screenshots/open_app.png"><br>
-    <i>Open the App from within RStudio.</i>
-</p>
-
-
 3.  Run the App by clicking on the button `Run App` in the top right corner.
 
-<figure>
-<img src="screenshots/run_app.png"/>
-<figcaption align="center"><i>Run the App from within RStudio.</i></figcaption>
-</figure>
+><p align="center" width="100%">
+>    <img src="screenshots/run_app.png"><br>
+>    <i>Run the App from within RStudio.</i>
+></p>
 
 4.  The App will open in a new RStudio window. Alternatively, click on `Open in Browser` at the top to open the App within your favorite browser (Firefox, Chrome...). It does not make much difference, though, whether the App is opened in RStudio or in the browser.
 
-<figure>
-<img src="screenshots/app_general_LSM_empty.png"/>
-<figcaption align="center"><i>App freshly opened (no input yet).</i></figcaption>
-</figure>
+><p align="center" width="100%">
+>    <img src="screenshots/app_general_LSM_empty.png"><br>
+>    <i>App freshly opened (no input yet).</i>
+></p>
 
 5.  Enter the information as explained in the following section ([Operating instructions](#operating-instructions)).
 
@@ -120,15 +109,15 @@ Start again at the tab "General" if you switch to another instrument.
 Make sure you specify the full details of the version including hot fixes (HF).  
 If you used more than 1 software packages, enter the versions in the same order as the software packages and separate them with semi-colons **without** space (e.g. "v12 HF5;v3 HF2").
 
-<figure>
-<img src="screenshots/app_general_LSM_filled.png"/>
-<figcaption align="center"><i>General tab for the Axio Imager.Z2 Vario + LSM 800 MAT.</i></figcaption>
-</figure>
+><p align="center" width="100%">
+>    <img src="screenshots/app_general_LSM_filled.png"><br>
+>    <i>General tab for the Axio Imager.Z2 Vario + LSM 800 MAT.</i>
+></p>
 
-<figure>
-<img src="screenshots/app_general_SZ_filled.png"/>
-<figcaption align="center"><i>General tab for the Smartzoom 5.</i></figcaption>
-</figure>
+><p align="center" width="100%">
+>    <img src="screenshots/app_general_SZ_filled.png"><br>
+>    <i>General tab for the Smartzoom 5.</i>
+></p>
 
 
 ## Tab "Objectives"
@@ -137,17 +126,17 @@ On the Axio Imager.Z2 Vario + LSM 800 MAT:
 - Several uses can be assigned to every objective. To do so, click on every relevant use from the list. 
 - After selection, click on a use and press "DELETE" to unassign it. Make sure that at least one use is assigned to each objective (select "Not used" if you have not used a given objective).
 
-<figure>
-<img src="screenshots/app_objectives_LSM.png"/>
-<figcaption align="center"><i>Objectives tab for the Axio Imager.Z2 Vario + LSM 800 MAT.</i></figcaption>
-</figure>
+><p align="center" width="100%">
+>    <img src="screenshots/app_objectives_LSM.png"><br>
+>    <i>Objectives tab for the Axio Imager.Z2 Vario + LSM 800 MAT.</i>
+></p>
 
 On the Smartzoom 5: by default, none of the objectives has been used, so make sure you assign a use to at least one objective.
 
-<figure>
-<img src="screenshots/app_objectives_SZ.png"/>
-<figcaption align="center"><i>Objectives tab for the Smartzoom 5.</i></figcaption>
-</figure>
+><p align="center" width="100%">
+>    <img src="screenshots/app_objectives_SZ.png"><br>
+>    <i>Objectives tab for the Smartzoom 5.</i>
+></p>
 
 
 ## Tab "Acquisition"
@@ -158,33 +147,33 @@ WIP
 **Enter the options of the pre-processing methods in this tab.**  
 Only a 2D acquisition does not require pre-processing. So if you did not select anything else than "2D" in the [tab "General"](#tab-general), no input is needed in the tab "Pre-processing" and a message notifies you of this.
 
-<figure>
-<img src="screenshots/app_pre-proc_LSM_none.png"/>
-<figcaption align="center"><i>No information on pre-processing is needed.</i></figcaption>
-</figure>
+><p align="center" width="100%">
+>    <img src="screenshots/app_pre-proc_LSM_none.png"><br>
+>    <i>No information on pre-processing is needed.</i>
+></p>
 
 Different fields to fill in appear depending on instrument used and on the acquisition modes applied.
 
-<figure>
-<img src="screenshots/app_pre-proc_LSM.png"/>
-<figcaption align="center"><i>Pre-processing tab for the Axio Imager.Z2 Vario + LSM 800 MAT.</i></figcaption>
-</figure>
+><p align="center" width="100%">
+>    <img src="screenshots/app_pre-proc_LSM.png"><br>
+>    <i>Pre-processing tab for the Axio Imager.Z2 Vario + LSM 800 MAT.</i>
+></p>
 
 Specific to the Smartzoom, if you applied EDF/3D, use the slider to specify the range of number of slices you used (minimum to maximum) for the stacking.
 
-<figure>
-<img src="screenshots/app_pre-proc_SZ.png"/>
-<figcaption align="center"><i>Pre-processing tab for the Smartzoom 5.</i></figcaption>
-</figure>
+><p align="center" width="100%">
+>    <img src="screenshots/app_pre-proc_SZ.png"><br>
+>    <i>Pre-processing tab for the Smartzoom 5.</i>
+></p>
 
 
 ## Tab "Abbreviations"
 **This tab lists the abbreviations used in other places of the App.**
 
-<figure>
-<img src="screenshots/app_abbreviations.png"/>
-<figcaption align="center"><i>Abbreviations tab.</i></figcaption>
-</figure>
+><p align="center" width="100%">
+>    <img src="screenshots/app_abbreviations.png"><br>
+>    <i>Abbreviations tab.</i>
+></p>
 
 
 ## Tab "Report"
