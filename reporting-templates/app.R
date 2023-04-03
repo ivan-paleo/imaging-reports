@@ -213,8 +213,6 @@ server <- function(input, output) {
       assign("edf_title", "EDF/3D (WF)", envir = .GlobalEnv)
       assign("edf_set", "Number of slices", envir = .GlobalEnv)
       assign("edf_set_val", list(edf_num_slices = "NumberSlices"), envir = .GlobalEnv)
-      edf_info <- function(x) sliderInput(names(edf_set_val)[x], edf_set[x], min = 1, max = 200, value = c(50, 60))
-
       assign("stitch_set", c("Blending", "Stitching Options"), envir = .GlobalEnv)
       assign("stitch_set_val", list(stitch_blend = c("On", "Off"),
                                     stitch_opt = c("Pixel", "Stage")),
@@ -226,8 +224,6 @@ server <- function(input, output) {
       assign("edf_set", c("Method", "Z-Stack alignment"), envir = .GlobalEnv)
       assign("edf_set_val", list(edf_method = c("Wavelets", "Contrast", "Maximum Projection", "Variance"),
                                  edf_alignment = c("No alignment", "Normal", "High", "Highest")), envir = .GlobalEnv)
-      edf_info <- function(x) selectInput(names(edf_set_val)[x], edf_set[x], choices = edf_set_val[[x]])
-
       assign("stitch_set", c("Fuse tiles", "Correct shading", "Edge Detector",
                              "Comparer", "Global Optimizer"), envir = .GlobalEnv)
       assign("stitch_set_val", list(stitch_fuse = c("Activated", "Deactived"),
@@ -239,30 +235,45 @@ server <- function(input, output) {
     }
 
     tagList(
-      h2(edf_title),
+      # Only one widget can be rendered within an 'if' call (because of the comma at the end of the widget call?)
+      # So 'if' statements are repeated
+
+      # Display message in case no-processing was selected in the tab 'General'
+      if (is.null(input$acq_mode)) h2("No pre-processing applied."),
+      if (is.null(input$acq_mode)) h5("If you did apply some pre-processing, specify it in the tab 'General' and come back to the tab 'Pre-processing' to enter the details."),
+
+      # If EDF/3D was applied
+      if (any(input$acq_mode %in% c("EDF", "3D"))) h2(edf_title),
 
       # The different microscopes need different types of input (slider vs. select)
-      # So custom function 'edf_info()' created in renderUI() above
-      # Use 'edf_info()' in a loop to render input widget
-      lapply(seq_along(edf_set), function(i) edf_info(i)),
+      if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT" & any(input$acq_mode %in% c("EDF", "3D"))) {
+        lapply(seq_along(edf_set), function(i) selectInput(names(edf_set_val)[i], edf_set[i], choices = edf_set_val[[i]]))
+      },
+      if (input$instrument == "Smartzoom 5" & any(input$acq_mode %in% c("EDF", "3D"))) {
+        lapply(seq_along(edf_set), function(i) sliderInput(names(edf_set_val)[i], edf_set[i],
+                                                           min = 1, max = 200, value = c(50, 60)))
+      },
 
-      h2("Stitching (WF)"),
-      lapply(seq_along(stitch_set), function(i) {
-        selectInput(names(stitch_set_val)[i], stitch_set[i], choices = stitch_set_val[[i]])
-      }),
-
-      # Only one widget can be rendered within an 'if' call (because of the comma at the end of the widget call?)
-      if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT") {
+      # If stitching was applied
+      if (any(input$acq_mode == "Stitching")) h2("Stitching (WF)"),
+      if (any(input$acq_mode == "Stitching")) {
+        lapply(seq_along(stitch_set), function(i) {
+          selectInput(names(stitch_set_val)[i], stitch_set[i], choices = stitch_set_val[[i]])
+        })
+      },
+      if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT" & any(input$acq_mode == "Stitching")) {
         numericInput("stitch_overlap", "Minimal Overlap [%]", min = 0, max = 100, value = 5)
       },
-      if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT") {
+      if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT" & any(input$acq_mode == "Stitching")) {
         numericInput("stitch_shift", "Maximal Shift [%]", min = 0, max = 100, value = 10)
       },
-      if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT") h2("3D Topography (LSM)"),
-      if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT") {
+      if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT" & any(input$acq_mode == "3D Topography")) {
+        h2("3D Topography (LSM)")
+      } ,
+      if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT" & any(input$acq_mode == "3D Topography")) {
         numericInput("topo_noise_low", "Data quality - Noise cut: lowest level", min = 0, max = 65335, value = 0)
       },
-      if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT") {
+      if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT" & any(input$acq_mode == "3D Topography")) {
         numericInput("topo_noise_high", "Data quality - Noise cut: highest level", min = 0, max = 65335, value = 65335)
       }
     )
@@ -272,26 +283,71 @@ server <- function(input, output) {
   # 3.4.2. Create output for pre-processing settings
   report_proc <- reactive({
 
+    # Create data.frame in case no pre-processing was applied.
+    # Information will be rbind()ed to it in case pre-processing was applied.
+    temp <- data.frame(Category = "No pre-processing applied", Setting = NA, Value = NA)
+
     # Not all settings are relevant for all microscopes, so output data.frames must be put together differently
     if (input$instrument == "Smartzoom 5") {
-      temp <- data.frame(
-        Category = c(rep(edf_title, length(edf_set)), rep("Stitching (WF)", length(stitch_set))),
-        Setting = c(edf_set, stitch_set),
-        Value = c(sapply(seq_along(edf_set_val), function(i) paste(input[[names(edf_set_val)[i]]], collapse = "-")),
-                sapply(seq_along(stitch_set_val), function(i) input[[names(stitch_set_val)[i]]]))
-      )
+
+      # Add information if EDF/3D was applied
+      if (any(input$acq_mode %in% c("EDF", "3D"))) {
+        temp <- rbind(temp, data.frame(
+                      Category = rep(edf_title, length(edf_set)),
+                      Setting = edf_set,
+                      Value = sapply(seq_along(edf_set_val),
+                                     function(i) paste(input[[names(edf_set_val)[i]]], collapse = "-"))
+        ))
+      }
+
+      # Add information if stitching was applied
+      if (any(input$acq_mode == "Stitching")) {
+        temp <- rbind(temp, data.frame(
+                      Category = rep("Stitching (WF)", length(stitch_set)),
+                      Setting = stitch_set,
+                      Value = sapply(seq_along(stitch_set_val), function(i) input[[names(stitch_set_val)[i]]])
+        ))
+      }
 
     # Only one 'if' call possible within 'reactive()', so 'if... else' was chosen
     # Nested 'if... else' might be needed when more than 2 instruments are available
     } else {
-      temp <- data.frame(
-        Category = c(rep(edf_title, length(edf_set)), rep("Stitching (WF)", length(stitch_set) + 2), "Topography (LSM)"),
-        Setting = c(edf_set, stitch_set, "Minimal Overlap [%]", "Maximal Shift [%]", "Data quality (Noise Cut)"),
-        Value = c(sapply(seq_along(edf_set_val), function(i) input[[names(edf_set_val)[i]]]),
-                  sapply(seq_along(stitch_set_val), function(i) input[[names(stitch_set_val)[i]]]),
-                  input$stitch_overlap, input$stitch_shift, paste0(input$topo_noise_low, "-", input$topo_noise_high, " levels"))
-      )
+      if (any(input$acq_mode %in% c("EDF", "3D"))) {
+        temp <- rbind(temp, data.frame(
+          Category = rep(edf_title, length(edf_set)),
+          Setting = edf_set,
+          Value = sapply(seq_along(edf_set_val), function(i) input[[names(edf_set_val)[i]]])
+        ))
+      }
+      if (any(input$acq_mode == "Stitching")) {
+        temp <- rbind(temp, data.frame(
+          Category = rep("Stitching (WF)", length(stitch_set) + 2),
+          Setting = c(stitch_set, "Minimal Overlap [%]", "Maximal Shift [%]"),
+          Value = c(sapply(seq_along(stitch_set_val), function(i) input[[names(stitch_set_val)[i]]]),
+                    input$stitch_overlap, input$stitch_shift)
+        ))
+      }
+      if (any(input$acq_mode == "3D Topography")) {
+        temp <- rbind(temp, data.frame(
+          Category = "Topography (LSM)",
+          Setting = "Data quality (Noise Cut)",
+          Value = paste0(input$topo_noise_low, "-", input$topo_noise_high, " levels")
+        ))
+      }
+      #temp <- data.frame(
+      #  Category = c(rep(edf_title, length(edf_set)), rep("Stitching (WF)", length(stitch_set) + 2), "Topography (LSM)"),
+      #  Setting = c(edf_set, stitch_set, "Minimal Overlap [%]", "Maximal Shift [%]", "Data quality (Noise Cut)"),
+      #  Value = c(sapply(seq_along(edf_set_val), function(i) input[[names(edf_set_val)[i]]]),
+      #            sapply(seq_along(stitch_set_val), function(i) input[[names(stitch_set_val)[i]]]),
+      #            input$stitch_overlap, input$stitch_shift, paste0(input$topo_noise_low, "-", input$topo_noise_high, " levels"))
+      #)
     }
+
+    # If pre-processing was applied, remove first row (based on NA in 'temp$Setting')
+    if (nrow(temp) > 1) temp <- temp[!is.na(temp$Setting), ]
+
+    # Specify object to output
+    return(temp)
   })
 
 

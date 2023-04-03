@@ -20,9 +20,6 @@
         - [Tab "Report"](#tab-report)
 - [How to adapt the App](#how-to-adapt-the-app)
 - [How to contribute](#how-to-contribute)
-    - [Submit an issue](#submit-an-issue)
-    - [Propose changes](#propose-changes)
-    - [Send me an email](#send-me-an-email)
 - [License](#license)
 
 <!-- /TOC -->
@@ -32,12 +29,12 @@
 
 
 ## Purpose
-This repository contains a **[Shiny App](reporting-templates/app.R)** that guides users to **create a report for microscope images acquired at the Impaging Platform at LEIZA ([IMPALA](https://www.leiza.de/forschung/infrastrukturen/labore/impala)) with all the necessary metadata.**
+This repository contains a **[Shiny App](reporting-templates/app.R)** that guides users to **create a report for microscope images acquired at the Imaging Platform at LEIZA ([IMPALA](https://www.leiza.de/forschung/infrastrukturen/labore/impala)) with all the necessary metadata.**
 
 Once all fields are entered, **the report can be exported to an XLSX file**.  
-I would have preferred to export to a truly open format, but I believe that several sheets are more appropriate (so no CSV) and the export to ODS does not work properly for an unknown reason.
+I would have preferred to export to a truly open format, but I believe that several sheets are more appropriate (so no CSV) and the export to ODS does not work for an unknown reason.
 
-**This report can and should be published together with the image data.** While publishing them as a supplementary material to a paper is OK, I recommend to publish everything in open access on an online repository like [Zenodo](https://zenodo.org/), [Figshare](https://figshare.com/) or [OSF](https://osf.io/) for easy and long-term accessibility. Additionally or alternatively, the report could be attached to a protocol, for example on [protocols.io](https://www.protocols.io/). 
+**This report can and should be published together with the image data.** While publishing them as a supplementary material to a paper is OK, I recommend publishing everything in open access on an online repository like [Zenodo](https://zenodo.org/), [Figshare](https://figshare.com/) or [OSF](https://osf.io/) for easy and long-term accessibility. Additionally or alternatively, the report could be attached to a protocol, for example on [protocols.io](https://www.protocols.io/). 
 
 The App is designed for the instruments available at the [IMPALA](https://www.leiza.de/forschung/infrastrukturen/labore/impala) and currently includes only the digital microscope (Zeiss Smartzoom 5) and the upright light microscope + LSCM (Zeiss Imager.Z2 Vario + LSM 800 MAT). More instruments will be added later.
 
@@ -114,7 +111,7 @@ There are two ways to get the App:
 ## How to adapt the App
 I have tried to make the code of the App as clear as possible and to comment it as much as possible. This is surely not perfect, especially because the code is long and imbricated, but I hope this will be enough for future developments and adaptations.
 
-If you would like to adapt the App to your instrument(s), feel free to do so on your own (see section [Download the repository](#download-the-repository)). Nevertheless, **I would appreciate if you would be willing to [contribute](#how-to-contribute)**! You can also get in touch with me directly (see section [Send me an email](#send-me-an-email)).
+If you would like to adapt the App to your instrument(s), feel free to do so on your own (see section [Download the repository](#download-the-repository)). Nevertheless, **I would appreciate if you would be willing to [contribute](#how-to-contribute)**! You can also get in touch with me directly.
 
 
 <hr style="border-width:6px; color:gray">
@@ -123,19 +120,13 @@ If you would like to adapt the App to your instrument(s), feel free to do so on 
 ## How to contribute
 I appreciate any comment from anyone (expert or novice) to improve this App, so do not be shy! There are three possibilities to contribute:
 
-<hr style="border-width:2px; color:gray">
-
-### Submit an issue  
+1. Submit an issue  
 If you notice any problem or have a question, submit an [issue](https://docs.github.com/en/issues/tracking-your-work-with-issues/about-issues). You can do so [here](https://github.com/ivan-paleo/reporting-templates/issues).  
 
-<hr style="border-width:2px; color:gray">
-
-### Propose changes  
+2. Propose changes  
 If you know how to write a [Shiny App](https://shiny.rstudio.com/), please propose text edits as a [pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests) (abbreviated "PR").
 
-<hr style="border-width:2px; color:gray">
-
-### Send me an email  
+3. Send me an email  
 For options 1-2, you need to create a GitHub account. If you do not have one and do not want to sign up, you can still write me an email (Google me to find my email address).
 
 By participating in this project, you agree to abide by our [code of conduct](CONDUCT.md).
