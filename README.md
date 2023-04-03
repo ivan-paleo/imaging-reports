@@ -65,10 +65,7 @@ There are two ways to get the App:
 1.  Open the file [reporting-templates.Rproj](reporting-templates.Rproj) with RStudio.
 2.  Open the file `reporting-templates/app.R` from within RStudio by clicking on it in the `Files` panel.
 
-><figure>
-><img src="screenshots/open_app.png"/>
-><figcaption align="center"><i>Open the App from within RStudio.</i></figcaption>
-></figure>
+><figure><img src="screenshots/open_app.png"/><figcaption align="center"><i>Open the App from within RStudio.</i></figcaption></figure>
 
 3.  Run the App by clicking on the button `Run App` in the top right corner.
 
