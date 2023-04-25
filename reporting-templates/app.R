@@ -248,8 +248,8 @@ server <- function(input, output) {
       # So 'if' statements are repeated
 
       # Display message in case no-processing was selected in the tab 'General'
-      if (is.null(input$acq_mode)) h2("No pre-processing applied."),
-      if (is.null(input$acq_mode)) h5("If you did apply some pre-processing, specify it in the tab 'General' and come back to the tab 'Pre-processing' to enter the details."),
+      if (is.null(input$acq_mode) || input$acq_mode == "2D") h2("No pre-processing applied."),
+      if (is.null(input$acq_mode) || input$acq_mode == "2D") h5("If you did apply some pre-processing, specify it in the tab 'General' and come back to the tab 'Pre-processing' to enter the details."),
 
       # If EDF/3D was applied
       if (any(input$acq_mode %in% c("EDF", "3D"))) h2(edf_title),
@@ -278,7 +278,7 @@ server <- function(input, output) {
       },
       if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT" & any(input$acq_mode == "3D Topography")) {
         h2("3D Topography (LSM)")
-      } ,
+      },
       if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT" & any(input$acq_mode == "3D Topography")) {
         numericInput("topo_noise_low", "Data quality - Noise cut: lowest level", min = 0, max = 65335, value = 0)
       },
