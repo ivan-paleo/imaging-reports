@@ -53,7 +53,7 @@ I am planning to make the App available online on a server, but the App can curr
 
 
 ## Pre-requisites
-The repository and the Shiny App have been written in [RStudio](https://posit.co/products/open-source/rstudio/), so you first need to download and install [R](https://www.r-project.org/) and [RStudio](https://posit.co/download/rstudio-desktop/).\ But fear not, **no knowledge of R/Rstudio is needed to run the App**!
+The repository and the Shiny App have been written in [RStudio](https://posit.co/products/open-source/rstudio/), so you first need to download and install [R](https://www.r-project.org/) and [RStudio](https://posit.co/download/rstudio-desktop/). But fear not, **no knowledge of R/Rstudio is needed to run the App**!
 
 
 ## Download the repository
@@ -219,7 +219,7 @@ By participating in this project, you agree to abide by our [code of conduct](CO
 
 [![CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](http://creativecommons.org/licenses/by-nc-sa/4.0/)
 
-This work is licensed under a [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-nc-sa/4.0/).
+This work is licensed under a [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-nc-sa/4.0/). See [LICENSE](LICENSE).
 
 Author: Ivan Calandra
 
