@@ -33,8 +33,8 @@ ui <- fluidPage(
       selectInput("instrument", "Choose the instrument",
                   c("Axio Imager.Z2 Vario + LSM 800 MAT", "Smartzoom 5")),
 
-      # TraCEr logo - will need to be replaced with IMPALA logo
-      img(src = "TraCEr_Logo_black.png", height = 150)
+      # LEIZA logo
+      img(src = "Leiza_Logo_Deskriptor_CMYK_rot_LEIZA.png", height = 150)
     ),
 
     # 2.3. Main panel
@@ -103,7 +103,7 @@ server <- function(input, output) {
                                        Setting = c("Last yearly inspection and calibration by manufacturer",
                                                    "Last topography correction for used objectives",
                                                    "Last control for used objectives with the roughness standard (nominal Ra = 0.40 ± 0.05 µm)"),
-                                       Value = c("2022-10-11", "2022-10-11", "2021-12-22")),
+                                       Value = c("2023-09-19", "2023-05-18", "2023-05-18")),
              envir = .GlobalEnv
       )
     }
@@ -210,6 +210,25 @@ server <- function(input, output) {
   # 3.2.3. Render output for objective settings in the tab "Report" in the table 'obj_set'
   output$obj_set <- renderTable({
     report_obj()
+  })
+
+
+
+
+  # 3.3. Tab Acquisition
+  # 3.3.1. Render tab 'acq'
+  output$acq <- renderUI({
+
+  })
+
+  # 3.3.2. Create output for acquisition settings
+  report_acq <- reactive({
+
+  })
+
+  # 3.3.3. Render output for acquisition settings in the tab "Acquisition" in the table 'acq_set'
+  output$acq_set <- renderTable({
+    report_acq()
   })
 
 
@@ -344,13 +363,6 @@ server <- function(input, output) {
           Value = paste0(input$topo_noise_low, "-", input$topo_noise_high, " levels")
         ))
       }
-      #temp <- data.frame(
-      #  Category = c(rep(edf_title, length(edf_set)), rep("Stitching (WF)", length(stitch_set) + 2), "Topography (LSM)"),
-      #  Setting = c(edf_set, stitch_set, "Minimal Overlap [%]", "Maximal Shift [%]", "Data quality (Noise Cut)"),
-      #  Value = c(sapply(seq_along(edf_set_val), function(i) input[[names(edf_set_val)[i]]]),
-      #            sapply(seq_along(stitch_set_val), function(i) input[[names(stitch_set_val)[i]]]),
-      #            input$stitch_overlap, input$stitch_shift, paste0(input$topo_noise_low, "-", input$topo_noise_high, " levels"))
-      #)
     }
 
     # If pre-processing was applied, remove first row (based on NA in 'temp$Setting')
