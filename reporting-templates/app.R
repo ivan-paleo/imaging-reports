@@ -63,8 +63,9 @@ ui <- fluidPage(
           h2("Pre-processing settings"),
           tableOutput("proc_set"),
 
-          # Add a button to download the report
-          downloadButton("downloadReport", "Download Report to XLSX"))
+          # Add buttons to download the report
+          downloadButton("downloadReportODS", "Download Report to ODS"),
+          downloadButton("downloadReportXLSX", "Download Report to XLSX"))
         )
       )
     )
@@ -248,14 +249,14 @@ server <- function(input, output) {
       # So 'if' statements are repeated
 
       # Display message in case no-processing was selected in the tab 'General'
-      if (is.null(input$acq_mode) || input$acq_mode == "2D") h2("No pre-processing applied."),
-      if (is.null(input$acq_mode) || input$acq_mode == "2D") h5("If you did apply some pre-processing, specify it in the tab 'General' and come back to the tab 'Pre-processing' to enter the details."),
+      if (all(is.null(input$acq_mode) | input$acq_mode == "2D")) h2("No pre-processing applied."),
+      if (all(is.null(input$acq_mode) | input$acq_mode == "2D")) h5("If you did apply some pre-processing, specify it in the tab 'General' and come back to the tab 'Pre-processing' to enter the details."),
 
       # If EDF/3D was applied
       if (any(input$acq_mode %in% c("EDF", "3D"))) h2(edf_title),
 
       # The different microscopes need different types of input (slider vs. select)
-      if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT" & any(input$acq_mode %in% c("EDF", "3D"))) {
+      if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT" & any(input$acq_mode == "EDF")) {
         lapply(seq_along(edf_set), function(i) selectInput(names(edf_set_val)[i], edf_set[i], choices = edf_set_val[[i]]))
       },
       if (input$instrument == "Smartzoom 5" & any(input$acq_mode %in% c("EDF", "3D"))) {
@@ -389,21 +390,34 @@ server <- function(input, output) {
 
 
 
-  # 3.6. Define what happens when one clicks on the download button
-  output$downloadReport <- downloadHandler(
+  # 3.6. Define what happens when one clicks on the download buttons
+  # 3.6.1. ODS
+  output$downloadReportODS <- downloadHandler(
 
-    # 3.6.1. Create file name for file to be downloaded
+    # Create file name for file to be downloaded
+    filename = function() {
+      paste("IMPALA-report_", gsub(" ", "-", input$name),
+            format(Sys.time(), "_%Y-%m-%d_%H-%M-%S"), ".ods", sep = "")
+    },
+
+    # Define content
+    content = function(file){
+
+      # Write to ODS, each table in a sheet
+      readODS::write_ods(list(General_settings = report_general(), Objectives = report_obj(),
+                              Pre_processing = report_proc(), Abbreviations = report_abbr()), file)
+    }
+  )
+
+  # 3.6.2. XLSX
+  output$downloadReportXLSX <- downloadHandler(
     filename = function() {
       paste("IMPALA-report_", gsub(" ", "-", input$name),
             format(Sys.time(), "_%Y-%m-%d_%H-%M-%S"), ".xlsx", sep = "")
     },
-
-    # 3.6.2. Define content
     content = function(file){
-
-      # Write to XLSX, each table in a sheet
-      writexl::write_xlsx(list(General_settings = report_general(), Objectives = report_obj(), Pre_processing = report_proc(),
-                               Abbreviations = report_abbr()), file)
+      writexl::write_xlsx(list(General_settings = report_general(), Objectives = report_obj(),
+                              Pre_processing = report_proc(), Abbreviations = report_abbr()), file)
     }
   )
 }
