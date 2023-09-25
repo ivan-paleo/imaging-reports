@@ -35,8 +35,7 @@
 
 This repository contains a [**Shiny App**](reporting-templates/app.R) that guides users to **create a report for microscope images acquired at the Imaging Platform at LEIZA ([IMPALA](https://www.leiza.de/forschung/infrastrukturen/labore/impala)) with all the necessary metadata.**
 
-Once all fields are entered, **the report can be exported to an XLSX file**.  
-I would have preferred to export to a truly open format, but I believe that several sheets are more appropriate (so no CSV) and the export to ODS does not work for an unknown reason.
+Once all fields are entered, **the report can be exported to an ODS or XLSX file**.  
 
 **This report can and should be published together with the image data.** While publishing them as a supplementary material to a paper is OK, I recommend publishing everything in open access on an online repository like [Zenodo](https://zenodo.org/), [Figshare](https://figshare.com/) or [OSF](https://osf.io/) for easy and long-term accessibility. Additionally or alternatively, the report could be attached to a protocol, for example on [protocols.io](https://www.protocols.io/).
 
@@ -184,7 +183,7 @@ Specific to the Smartzoom, if you applied EDF/3D, use the slider to specify the 
 **This tab shows a preview of the entered information.**  
 I recommend that you check that everything is correct before you download the report (see below).  
 As mentioned already [here](#introduction), it can be that some fields are not updated in this tab. In such cases, go back to the beginning ([side bar](#side-bar)) and follow the tabs from left ([General](#tab-general)) to right ([Pre-processing](#tab-pre-processing)).  
-Once done, click on the `Download Report to XLSX` button at the bottom of the tab. Save the file to your computer; I recommend to use the name provided. **Check the file.**
+Once done, click on the `Download Report to ODS` or `Download Report to XLSX` buttons at the bottom of the tab. Save the file to your computer; I recommend to use the name provided. **Check the file.**
 
 *WIP: Screenshots will be added later.*
 
