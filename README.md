@@ -141,6 +141,14 @@ On the Smartzoom 5: by default, none of the objectives has been used, so make su
 >    <i>Objectives tab for the Smartzoom 5.</i>
 ></p>
 
+Below the fields to assign uses to objectives, a barplot shows the lateral optical resolutions of each used objective. For the Axio Imager.Z2 Vario + LSM 800 MAT, you have the choice for the wavelength of the light source (`Violet laser (405 nm) - LSM` for the LSM 800 MAT or `White LED (550 nm) - WF` for the Axio Imager.Z2 Vario) but only the latter is available for the Smartzoom 5.  
+The graph can be exported to PDF or PNG using the buttons below.
+
+><p align="center" width="100%">
+>    <img src="screenshots/app_objectives_resolution.png"><br>
+>    <i>Objectives tab for the Smartzoom 5.</i>
+></p>
+
 
 ## Tab "Acquisition"
 WIP

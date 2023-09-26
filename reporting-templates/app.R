@@ -1,5 +1,5 @@
 # Shiny app to enter the settings of acquisitions at the IMPALA
-# Download the settings in an editable (XLSX) report
+# Download the settings in an editable (XLSX/ODS) report
 # Written by Ivan Calandra
 
 
@@ -9,7 +9,8 @@
 # 1. Load libraries
 library(shiny)
 library(writexl)
-#library(shinyforms)
+library(readODS)
+library(tidyverse)
 
 
 #####
@@ -45,7 +46,8 @@ ui <- fluidPage(
 
         # Tabs, their UIs will be rendered in the server call below
         tabPanel("General", uiOutput("general")),
-        tabPanel("Objectives", uiOutput("obj")),
+        tabPanel("Objectives", uiOutput("obj"), downloadButton("downloadGraphPDF", "Download graph to PDF"),
+                 downloadButton("downloadGraphPNG", "Download graph to PNG")),
         tabPanel("Acquisition", uiOutput("acq")),
         tabPanel("Pre-processing", uiOutput("proc")),
         tabPanel("Abbreviations", tableOutput("abbr")),
@@ -164,20 +166,37 @@ server <- function(input, output) {
   # 3.2.1. Render tab 'obj'
   output$obj <- renderUI({
 
+    # Define objectives and settings for Smartzoom
     if (input$instrument == "Smartzoom 5") {
-      assign("objectives", paste0("PlanApoD ", c(1.6, 5), "x / NA = ", c(0.1, 0.3), " / WD = ", c(36, 30), " mm"), envir = .GlobalEnv)
+      obj_na <- c(0.1, 0.3)
+      obj_mag <- c("1.6x", "5x")
+      obj_Kna <- 0.61/obj_na
+      assign("objectives", paste0("PlanApoD ", obj_mag, " / NA = ", obj_na, " / WD = ", c(36, 30), " mm"), envir = .GlobalEnv)
       obj_use <- c("Color image", "Not used")
       sel_multi <- FALSE
       sel_value <- "Not used"
+      lambda <- 550
+      names(lambda) <- "White LED (550 nm) - WF"
     }
+
+    # Define objectives and settings for LSM
     if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT") {
-      assign("objectives", paste0("C Epiplan-Apochromat ", c(5, 10, 20, 20, 50, 50, 50), "x / NA = ",
-                           format(c(0.20, 0.40, 0.22, 0.70, 0.55, 0.75, 0.95), digits = 2), " / WD = ",
+      obj_na <- c(0.20, 0.40, 0.22, 0.70, 0.55, 0.75, 0.95)
+      obj_mag <- c("5x", "10x", "20x", "20x", "50x", "50x", "50x")
+      obj_Kna <- 0.51/obj_na
+      assign("objectives", paste0("C Epiplan-Apochromat ", obj_mag, " / NA = ",
+                           format(obj_na, digits = 2), " / WD = ",
                            c(21, 5.4, 12, 1.3, 9, 1, 0.22)," mm"), envir = .GlobalEnv)
       obj_use <- c("Preview scan", "Coordinate system", "Color image", "3D topography", "Not used")
       sel_multi <- TRUE
       sel_value <- NULL
+      lambda <- c(405, 550)
+      names(lambda) <- c("Violet laser (405 nm) - LSM", "White LED (550 nm) - WF")
     }
+
+    # Combine objectives' magnification and NA
+    obj_mag_na <- paste(obj_mag, format(obj_na, nsmall = 2), sep = "/") %>%
+      factor(., levels = .)
 
     tagList(
       h2("Specify how you used each objective"),
@@ -190,6 +209,34 @@ server <- function(input, output) {
         # select use from 'obj_use' and store the value into 'input[[paste0("obj",i)]]', which parses to e.g. "input$obj1"
         selectInput(paste0("obj", i), objectives[i], choices = obj_use,
                     width = "100%", multiple = sel_multi, selected = sel_value)
+      }),
+
+      h2("Optical lateral resolution for the objectives used"),
+      h5("The smaller the value of the optical lateral resolution, the better the resolution."),
+      withMathJax("The optical lateral resolution is calculated as follows, with K = 0.51 for LSCM and 0.61 for light microscopes: $$\\delta_L = \\frac{K*\\lambda}{NA}$$"),
+
+      # User selects the wavelength of the light source
+      selectInput("lambda", label = "Wavelength of light source (λ)", choices = lambda),
+
+      # Plot lateral optical resolution for each used objective
+      renderPlot({
+
+        # Calculate lateral optical resolution for each objective depending on wavelength
+        data.frame(obj = obj_mag_na, dL = obj_Kna/1000*as.numeric(input$lambda),
+
+                   # Column 'Use' is based on input$obj1, input$obj2...
+                   Use = sapply(seq_along(objectives), function(i) paste(input[[paste0('obj', i)]], collapse = ", "))) %>%
+
+          # Exclude unused objectives
+          filter(Use != "Not used") %>%
+
+          # Barplot
+          ggplot(aes(x = obj, y = dL)) +
+            geom_bar(stat = "identity") +
+            geom_text(aes(label = round(dL, digits = 3)), vjust = -0.5) +
+            theme_classic() +
+            theme(axis.text = element_text(size = 15), axis.title.y = element_text(size = 20)) +
+            labs(x = NULL, y = "Lateral optical resolution [µm]")
       })
     )
   })
@@ -197,13 +244,13 @@ server <- function(input, output) {
 
   # 3.2.2. Create output for objective settings
   report_obj <- reactive({
-    temp <- data.frame(
-      Objective = objectives,
-      Use = sapply(seq_along(objectives), function(i) paste(input[[paste0('obj', i)]], collapse = ", "))
-    )
+    data.frame(Objective = objectives,
 
-    # Exclude unused objectives from the report
-    temp <- temp[temp$Use != "Not used", ]
+               # Column 'Use' is based on input$obj1, input$obj2...
+               Use = sapply(seq_along(objectives), function(i) paste(input[[paste0('obj', i)]], collapse = ", "))) %>%
+
+      # Exclude unused objectives from the report
+      filter(Use != "Not used")
   })
 
 
@@ -403,7 +450,7 @@ server <- function(input, output) {
 
 
   # 3.6. Define what happens when one clicks on the download buttons
-  # 3.6.1. ODS
+  # 3.6.1. Report ODS
   output$downloadReportODS <- downloadHandler(
 
     # Create file name for file to be downloaded
@@ -421,7 +468,7 @@ server <- function(input, output) {
     }
   )
 
-  # 3.6.2. XLSX
+  # 3.6.2. Report XLSX
   output$downloadReportXLSX <- downloadHandler(
     filename = function() {
       paste("IMPALA-report_", gsub(" ", "-", input$name),
@@ -430,6 +477,28 @@ server <- function(input, output) {
     content = function(file){
       writexl::write_xlsx(list(General_settings = report_general(), Objectives = report_obj(),
                               Pre_processing = report_proc(), Abbreviations = report_abbr()), file)
+    }
+  )
+
+  # 3.6.3. Graph PDF
+  output$downloadGraphPDF <- downloadHandler(
+    filename = function() {
+      paste("IMPALA-graph_", gsub(" ", "-", input$name),
+            format(Sys.time(), "_%Y-%m-%d_%H-%M-%S"), ".pdf", sep = "")
+    },
+    content = function(file){
+      ggsave(file, device = "pdf", width = 190, units = "mm")
+    }
+  )
+
+  # 3.6.4. Graph PNG
+  output$downloadGraphPNG <- downloadHandler(
+    filename = function() {
+      paste("IMPALA-graph_", gsub(" ", "-", input$name), "_lambda", input$lambda, "nm",
+            format(Sys.time(), "_%Y-%m-%d_%H-%M-%S"), ".png", sep = "")
+    },
+    content = function(file){
+      ggsave(file, device = "png", width = 190, units = "mm")
     }
   )
 }
