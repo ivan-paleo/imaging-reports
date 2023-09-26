@@ -146,7 +146,7 @@ The graph can be exported to PDF or PNG using the buttons below.
 
 ><p align="center" width="100%">
 >    <img src="screenshots/app_objectives_resolution.png"><br>
->    <i>Objectives tab for the Smartzoom 5.</i>
+>    <i>Graph of lateral optical resolution for each used objective, with download buttons.</i>
 ></p>
 
 
