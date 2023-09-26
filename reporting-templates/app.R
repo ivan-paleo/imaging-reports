@@ -246,6 +246,9 @@ server <- function(input, output) {
   report_obj <- reactive({
     data.frame(Objective = objectives,
 
+               # Add column 'Manufacturer'
+               Manufacturer = "Carl Zeiss Microscopy GmbH",
+
                # Column 'Use' is based on input$obj1, input$obj2...
                Use = sapply(seq_along(objectives), function(i) paste(input[[paste0('obj', i)]], collapse = ", "))) %>%
 
@@ -455,8 +458,8 @@ server <- function(input, output) {
 
     # Create file name for file to be downloaded
     filename = function() {
-      paste("IMPALA-report_", gsub(" ", "-", input$name),
-            format(Sys.time(), "_%Y-%m-%d_%H-%M-%S"), ".ods", sep = "")
+      paste0("IMPALA-report_", gsub(" ", "-", input$name), "_", gsub(" ", "", gsub("\\+", "-", input$instrument)),
+            format(Sys.time(), "_%Y-%m-%d_%H-%M-%S"), ".ods")
     },
 
     # Define content
@@ -471,8 +474,8 @@ server <- function(input, output) {
   # 3.6.2. Report XLSX
   output$downloadReportXLSX <- downloadHandler(
     filename = function() {
-      paste("IMPALA-report_", gsub(" ", "-", input$name),
-            format(Sys.time(), "_%Y-%m-%d_%H-%M-%S"), ".xlsx", sep = "")
+      paste0("IMPALA-report_", gsub(" ", "-", input$name), "_", gsub(" ", "", gsub("\\+", "-", input$instrument)),
+            format(Sys.time(), "_%Y-%m-%d_%H-%M-%S"), ".xlsx")
     },
     content = function(file){
       writexl::write_xlsx(list(General_settings = report_general(), Objectives = report_obj(),
@@ -483,8 +486,8 @@ server <- function(input, output) {
   # 3.6.3. Graph PDF
   output$downloadGraphPDF <- downloadHandler(
     filename = function() {
-      paste("IMPALA-graph_", gsub(" ", "-", input$name),
-            format(Sys.time(), "_%Y-%m-%d_%H-%M-%S"), ".pdf", sep = "")
+      paste0("IMPALA-graph_", gsub(" ", "-", input$name), "_lambda", input$lambda, "nm",
+            format(Sys.time(), "_%Y-%m-%d_%H-%M-%S"), ".pdf")
     },
     content = function(file){
       ggsave(file, device = "pdf", width = 190, units = "mm")
@@ -494,8 +497,8 @@ server <- function(input, output) {
   # 3.6.4. Graph PNG
   output$downloadGraphPNG <- downloadHandler(
     filename = function() {
-      paste("IMPALA-graph_", gsub(" ", "-", input$name), "_lambda", input$lambda, "nm",
-            format(Sys.time(), "_%Y-%m-%d_%H-%M-%S"), ".png", sep = "")
+      paste0("IMPALA-graph_", gsub(" ", "-", input$name), "_lambda", input$lambda, "nm",
+            format(Sys.time(), "_%Y-%m-%d_%H-%M-%S"), ".png")
     },
     content = function(file){
       ggsave(file, device = "png", width = 190, units = "mm")

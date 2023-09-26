@@ -94,7 +94,8 @@ There are two ways to get the App:
 - In a strict sense, none of the fields are required. Yet, it is important that **you fill as many fields as possible**. Unedited fields will be filled with default values, so make sure you change them in case you did not apply default values.  
 - Some information that will be included in the report (see [tab "Report"](#tab-report)) is hard coded and does not depend on your input because it depends on the hardware only. Because of that (and other things), make sure you **use the latest version of the App**.  
 - **Every entered information summarizes all acquisitions about which you are reporting.** Therefore, do not fill the forms for every single acquisition bur rather for all acquisitions of a project.
-- While it is possible to jump from any tab to any other, conditional input (i.e. input based on other input) might not update correctly. Therefore, I recommend that you **start in the side bar and then fill in every tab from left ("General") to right ("Pre-processing")**. The tab "Report" can be consulted any time to check how the output will look like.
+- While it is possible to jump from any tab to any other, conditional input (i.e. input based on other input) might not update correctly. Therefore, I recommend that you **start in the side bar and then fill in every tab from left ("General") to right ("Pre-processing")**. The tab "Report" can be consulted any time to check how the output will look like.  
+- **You can save the settings for one instrument at a time.**  
 - **Refer to the instrument's user manual if you need information about the settings.**
 
 
@@ -192,6 +193,8 @@ Specific to the Smartzoom, if you applied EDF/3D, use the slider to specify the 
 I recommend that you check that everything is correct before you download the report (see below).  
 As mentioned already [here](#introduction), it can be that some fields are not updated in this tab. In such cases, go back to the beginning ([side bar](#side-bar)) and follow the tabs from left ([General](#tab-general)) to right ([Pre-processing](#tab-pre-processing)).  
 Once done, click on the `Download Report to ODS` or `Download Report to XLSX` buttons at the bottom of the tab. Save the file to your computer; I recommend to use the name provided. **Check the file.**
+
+**Save one report for each instrument you used.**
 
 *WIP: Screenshots will be added later.*
 
