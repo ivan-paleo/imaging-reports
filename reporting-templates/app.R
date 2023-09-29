@@ -46,7 +46,8 @@ ui <- fluidPage(
 
         # Tabs, their UIs will be rendered in the server call below
         tabPanel("General", uiOutput("general")),
-        tabPanel("Objectives", uiOutput("obj"), downloadButton("downloadGraphPDF", "Download graph to PDF"),
+        tabPanel("Objectives", uiOutput("obj"),
+                 downloadButton("downloadGraphPDF", "Download graph to PDF"),
                  downloadButton("downloadGraphPNG", "Download graph to PNG")),
         tabPanel("Acquisition", uiOutput("acq")),
         tabPanel("Pre-processing", uiOutput("proc")),
@@ -171,7 +172,9 @@ server <- function(input, output) {
       obj_na <- c(0.1, 0.3)
       obj_mag <- c("1.6x", "5x")
       obj_Kna <- 0.61/obj_na
-      assign("objectives", paste0("PlanApoD ", obj_mag, " / NA = ", obj_na, " / WD = ", c(36, 30), " mm"), envir = .GlobalEnv)
+      assign("objectives",
+             paste0("PlanApoD ", obj_mag, " / NA = ", obj_na, " / WD = ", c(36, 30), " mm"),
+             envir = .GlobalEnv)
       obj_use <- c("Color image", "Not used")
       sel_multi <- FALSE
       sel_value <- "Not used"
@@ -206,7 +209,8 @@ server <- function(input, output) {
       lapply(seq_along(objectives), function(i) {
 
         # for each objective, with labels taken from 'objectives',
-        # select use from 'obj_use' and store the value into 'input[[paste0("obj",i)]]', which parses to e.g. "input$obj1"
+        # select use from 'obj_use' and store the value into 'input[[paste0("obj",i)]]',
+        # which parses to e.g. "input$obj1"
         selectInput(paste0("obj", i), objectives[i], choices = obj_use,
                     width = "100%", multiple = sel_multi, selected = sel_value)
       }),
@@ -225,7 +229,8 @@ server <- function(input, output) {
         data.frame(obj = obj_mag_na, dL = obj_Kna/1000*as.numeric(input$lambda),
 
                    # Column 'Use' is based on input$obj1, input$obj2...
-                   Use = sapply(seq_along(objectives), function(i) paste(input[[paste0('obj', i)]], collapse = ", "))) %>%
+                   Use = sapply(seq_along(objectives),
+                                function(i) paste(input[[paste0('obj', i)]], collapse = ", "))) %>%
 
           # Exclude unused objectives
           filter(Use != "Not used") %>%
@@ -249,8 +254,12 @@ server <- function(input, output) {
                # Add column 'Manufacturer'
                Manufacturer = "Carl Zeiss Microscopy GmbH",
 
+               # Add column 'ImmersionMedium'
+               ImmersionMedium = "Air (dry)",
+
                # Column 'Use' is based on input$obj1, input$obj2...
-               Use = sapply(seq_along(objectives), function(i) paste(input[[paste0('obj', i)]], collapse = ", "))) %>%
+               Use = sapply(seq_along(objectives),
+                            function(i) paste(input[[paste0('obj', i)]], collapse = ", "))) %>%
 
       # Exclude unused objectives from the report
       filter(Use != "Not used")
@@ -268,12 +277,35 @@ server <- function(input, output) {
   # 3.3. Tab Acquisition
   # 3.3.1. Render tab 'acq'
   output$acq <- renderUI({
-
+    if (input$instrument == "Smartzoom 5") {
+      assign("illum_type", "Reflected light", envir = .GlobalEnv)
+    }
+    if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT") {
+      assign("illum_type", c("Reflected light", "Transmitted light"), envir = .GlobalEnv)
+    }
+    tagList(
+      h2("WF"),
+      selectInput("Illum_type", label = "Type of illumination", choices = illum_type),
+      sliderInput("Illum_intens", label = "Intensity of illumination [%]", min = 0, max = 100,
+                  value = 4, width = "100%"),
+      if (any(grepl("3D Topography", input$acq_mode))) h2("LSM"),
+      if (any(grepl("3D Topography", input$acq_mode))) sliderInput("Laser_intens",
+                    label = "Intensity of laser [%]", min = 0, max = 100, value = 4, width = "100%")
+    )
   })
 
   # 3.3.2. Create output for acquisition settings
   report_acq <- reactive({
-
+    temp <- data.frame(Category = "Illumination (WF)",
+                       Setting = c("Type", "Source", "Wavelength", "Power", "Intensity"),
+                       Value = c(input$Illum_type, "LED", "550 nm", "Unknown", paste(input$Illum_intens, "%")))
+    if (any(grepl("3D Topography", input$acq_mode))) {
+      temp <- rbind(temp, data.frame(Category = "Illumination (LSM)",
+                             Setting = c("Source", "Wavelength", "Power", "Intensity"),
+                             Value = c("Laser", "405 nm", "5 mW", paste(input$Laser_intens, "%"))
+      ))
+    }
+    return(temp)
   })
 
   # 3.3.3. Render output for acquisition settings in the tab "Acquisition" in the table 'acq_set'
@@ -302,11 +334,13 @@ server <- function(input, output) {
       assign("edf_title", "EDF (WF)", envir = .GlobalEnv)
       assign("edf_set", c("Method", "Z-Stack alignment"), envir = .GlobalEnv)
       assign("edf_set_val", list(edf_method = c("Wavelets", "Contrast", "Maximum Projection", "Variance"),
-                                 edf_alignment = c("No alignment", "Normal", "High", "Highest")), envir = .GlobalEnv)
+                                 edf_alignment = c("No alignment", "Normal", "High", "Highest")),
+             envir = .GlobalEnv)
       assign("stitch_set", c("Fuse tiles", "Correct shading", "Edge Detector",
                              "Comparer", "Global Optimizer"), envir = .GlobalEnv)
       assign("stitch_set_val", list(stitch_fuse = c("Activated", "Deactived"),
-                                    stitch_shading = c("Activated (Automatic)", "Activated (Reference)", "Deactivated"),
+                                    stitch_shading = c("Activated (Automatic)", "Activated (Reference)",
+                                                       "Deactivated"),
                                     stitch_edge = c("Yes", "No"),
                                     stitch_comp = c("Optimized", "Best", "Basic"),
                                     stitch_optim = c("Best", "Basic")),
@@ -326,11 +360,12 @@ server <- function(input, output) {
 
       # The different microscopes need different types of input (slider vs. select)
       if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT" & any(input$acq_mode == "EDF")) {
-        lapply(seq_along(edf_set), function(i) selectInput(names(edf_set_val)[i], edf_set[i], choices = edf_set_val[[i]]))
+        lapply(seq_along(edf_set), function(i) selectInput(names(edf_set_val)[i], edf_set[i],
+                                                           choices = edf_set_val[[i]]))
       },
       if (input$instrument == "Smartzoom 5" & any(input$acq_mode %in% c("EDF", "3D"))) {
         lapply(seq_along(edf_set), function(i) sliderInput(names(edf_set_val)[i], edf_set[i],
-                                                           min = 1, max = 200, value = c(50, 60)))
+                                                           min = 1, max = 200, value = c(50, 60), width = "100%"))
       },
 
       # If stitching was applied
@@ -350,10 +385,12 @@ server <- function(input, output) {
         h2("3D Topography (LSM)")
       },
       if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT" & any(input$acq_mode == "3D Topography")) {
-        numericInput("topo_noise_low", "Data quality - Noise cut: lowest level", min = 0, max = 65335, value = 0)
+        numericInput("topo_noise_low", "Data quality - Noise cut: lowest level", min = 0, max = 65335,
+                     value = 0)
       },
       if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT" & any(input$acq_mode == "3D Topography")) {
-        numericInput("topo_noise_high", "Data quality - Noise cut: highest level", min = 0, max = 65335, value = 65335)
+        numericInput("topo_noise_high", "Data quality - Noise cut: highest level", min = 0, max = 65335,
+                     value = 65335)
       }
     )
   })
@@ -366,7 +403,8 @@ server <- function(input, output) {
     # Information will be rbind()ed to it in case pre-processing was applied.
     temp <- data.frame(Category = "No pre-processing applied", Setting = NA, Value = NA)
 
-    # Not all settings are relevant for all microscopes, so output data.frames must be put together differently
+    # Not all settings are relevant for all microscopes,
+    # so output data.frames must be put together differently
     if (input$instrument == "Smartzoom 5") {
 
       # Add information if EDF/3D was applied
@@ -458,8 +496,9 @@ server <- function(input, output) {
 
     # Create file name for file to be downloaded
     filename = function() {
-      paste0("IMPALA-report_", gsub(" ", "-", input$name), "_", gsub(" ", "", gsub("\\+", "-", input$instrument)),
-            format(Sys.time(), "_%Y-%m-%d_%H-%M-%S"), ".ods")
+      paste0("IMPALA-report_", gsub(" ", "-", input$name), "_",
+             gsub(" ", "", gsub("\\+", "-", input$instrument)),
+             format(Sys.time(), "_%Y-%m-%d_%H-%M-%S"), ".ods")
     },
 
     # Define content
@@ -474,8 +513,9 @@ server <- function(input, output) {
   # 3.6.2. Report XLSX
   output$downloadReportXLSX <- downloadHandler(
     filename = function() {
-      paste0("IMPALA-report_", gsub(" ", "-", input$name), "_", gsub(" ", "", gsub("\\+", "-", input$instrument)),
-            format(Sys.time(), "_%Y-%m-%d_%H-%M-%S"), ".xlsx")
+      paste0("IMPALA-report_", gsub(" ", "-", input$name), "_",
+             gsub(" ", "", gsub("\\+", "-", input$instrument)),
+             format(Sys.time(), "_%Y-%m-%d_%H-%M-%S"), ".xlsx")
     },
     content = function(file){
       writexl::write_xlsx(list(General_settings = report_general(), Objectives = report_obj(),
@@ -487,7 +527,7 @@ server <- function(input, output) {
   output$downloadGraphPDF <- downloadHandler(
     filename = function() {
       paste0("IMPALA-graph_", gsub(" ", "-", input$name), "_lambda", input$lambda, "nm",
-            format(Sys.time(), "_%Y-%m-%d_%H-%M-%S"), ".pdf")
+             format(Sys.time(), "_%Y-%m-%d_%H-%M-%S"), ".pdf")
     },
     content = function(file){
       ggsave(file, device = "pdf", width = 190, units = "mm")
@@ -498,7 +538,7 @@ server <- function(input, output) {
   output$downloadGraphPNG <- downloadHandler(
     filename = function() {
       paste0("IMPALA-graph_", gsub(" ", "-", input$name), "_lambda", input$lambda, "nm",
-            format(Sys.time(), "_%Y-%m-%d_%H-%M-%S"), ".png")
+             format(Sys.time(), "_%Y-%m-%d_%H-%M-%S"), ".png")
     },
     content = function(file){
       ggsave(file, device = "png", width = 190, units = "mm")
