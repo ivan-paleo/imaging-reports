@@ -3,24 +3,30 @@
 # Written by Ivan Calandra
 
 
-#####
+###############################################################################################################
 
 
-# 1. Load libraries
+#####################
+# 1. Load libraries #
+#####################
+
 library(shiny)
 library(writexl)
 library(readODS)
 library(tidyverse)
 
 
-#####
+###############################################################################################################
 
 
-# 2. Define UI
+################
+# 2. Define UI #
+################
+
 ui <- fluidPage(
 
   # 2.1. Application title
-  titlePanel("Create a report for your microscope images acquired at the IMaging Platform At LeizA (IMPALA)"),
+  titlePanel("Create a report for your microscope images acquired at the Imaging Platform At LEIZA (IMPALA)"),
 
   sidebarLayout(
 
@@ -76,14 +82,19 @@ ui <- fluidPage(
 )
 
 
-####
+###############################################################################################################
 
 
-# 3. Define server logic
+##########################
+# 3. Define server logic #
+##########################
+
 server <- function(input, output) {
 
+  ####################
+  # 3.1. Tab General #
+  ####################
 
-  # 3.1. Tab General
   # 3.1.1. Render tab 'general'
   output$general <- renderUI({
 
@@ -106,7 +117,7 @@ server <- function(input, output) {
                                        Setting = c("Last yearly inspection and calibration by manufacturer",
                                                    "Last topography correction for used objectives",
                                                    "Last control for used objectives with the roughness standard (nominal Ra = 0.40 ± 0.05 µm)"),
-                                       Value = c("2023-09-19", "2023-05-18", "2023-05-18")),
+                                       Value = c("2024-06-18", "2023-05-18", "2023-08-05")),
              envir = .GlobalEnv
       )
     }
@@ -162,8 +173,13 @@ server <- function(input, output) {
 
 
 
+  #####################################################
 
-  # 3.2. Tab Objectives
+
+  #######################
+  # 3.2. Tab Objectives #
+  #######################
+
   # 3.2.1. Render tab 'obj'
   output$obj <- renderUI({
 
@@ -272,38 +288,88 @@ server <- function(input, output) {
   })
 
 
+  #####################################################
 
 
-  # 3.3. Tab Acquisition
+  ########################
+  # 3.3. Tab Acquisition #
+  ########################
+
   # 3.3.1. Render tab 'acq'
   output$acq <- renderUI({
     if (input$instrument == "Smartzoom 5") {
       assign("illum_type", "Reflected light", envir = .GlobalEnv)
+      assign("Camera", data.frame(Mode = "WF",
+                                  Category = "Camera",
+                                  Setting = c("Type", "Adapter", "Camera sensor size"),
+                                  Value = c("CMOS", "1x", "1''")
+                                  ),
+             envir = .GlobalEnv
+      )
+
     }
     if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT") {
       assign("illum_type", c("Reflected light", "Transmitted light"), envir = .GlobalEnv)
+      assign("Camera", data.frame(Mode = "WF",
+                                  Category = "Camera",
+                                  Setting = c("Type", "Manufacturer", "Model", "Adapter",
+                                              "Camera sensor size", "Camera pixel size"),
+                                  Value = c("CMOS", "Zeiss", "Axiocam 305 color", "1x", "8.5 x 7.1 mm",
+                                            "3.45 x 3.45 µm")
+                                  ),
+             envir = .GlobalEnv
+      )
     }
     tagList(
       h2("WF"),
       selectInput("Illum_type", label = "Type of illumination", choices = illum_type),
-      sliderInput("Illum_intens", label = "Intensity of illumination [%]", min = 0, max = 100,
-                  value = 4, width = "100%"),
-      if (any(grepl("3D Topography", input$acq_mode))) h2("LSM"),
-      if (any(grepl("3D Topography", input$acq_mode))) sliderInput("Laser_intens",
-                    label = "Intensity of laser [%]", min = 0, max = 100, value = 4, width = "100%")
+      splitLayout(cellWidths = c("25%", "75%"),
+                  numericInput("FOVx", label = "Total image size in X [µm]", value = 300, min = 1),
+                  numericInput("FOVy", label = "... and in Y [µm]", value = 200, min = 1)),
+      splitLayout(cellWidths = c("25%", "75%"),
+                  numericInput("FrameX", label = "Total number of pixels in X", value = 2048, min = 1),
+                  numericInput("FrameY", label = "... and in Y", value = 2048, min = 1)),
+      splitLayout(cellWidths = c("25%", "75%"),
+                  h5(paste("Pixel size in X =", round(input$FOVx / input$FrameX, digits = 3), "µm")),
+                  h5(paste("Pixel size in Y =", round(input$FOVy / input$FrameY, digits = 3), "µm"))
+                  ),
+      if (!isTRUE(all.equal(round(input$FOVx / input$FrameX, digits = 3),
+                            round(input$FOVy / input$FrameY, digits = 3)))) {
+        h5("Check the values: the pixels are not square")
+      } else {
+        h5("ok")
+      },
+      if (any(grepl("3D Topography", input$acq_mode))) h2("LSM")
     )
   })
 
   # 3.3.2. Create output for acquisition settings
   report_acq <- reactive({
-    temp <- data.frame(Category = "Illumination (WF)",
-                       Setting = c("Type", "Source", "Wavelength", "Power", "Intensity"),
-                       Value = c(input$Illum_type, "LED", "550 nm", "Unknown", paste(input$Illum_intens, "%")))
+    temp <- data.frame(Mode = "WF",
+                       Category = "Illumination",
+                       Setting = c("Type", "Source", "Wavelength", "Power"),
+                       Value = c(input$Illum_type, "LED", "550 nm (average)", "Unknown"))
+    temp <- rbind(temp, Camera)
+    temp <- rbind(temp, data.frame(Mode = "WF",
+                                   Category = "Image",
+                                   Setting = c("FOV", "Frame size"),
+                                   Value = c(paste(input$FOVx, "x", input$FOVy, "µm"),
+                                             paste(input$FrameX, "x", input$FrameY, "pixels"))
+                                   )
+                  )
     if (any(grepl("3D Topography", input$acq_mode))) {
-      temp <- rbind(temp, data.frame(Category = "Illumination (LSM)",
-                             Setting = c("Source", "Wavelength", "Power", "Intensity"),
-                             Value = c("Laser", "405 nm", "5 mW", paste(input$Laser_intens, "%"))
-      ))
+      temp <- rbind(temp, data.frame(Mode = "LSM",
+                                     Category = "Illumination",
+                                     Setting = c("Type", "Source", "Wavelength", "Power"),
+                                     Value = c("Reflected light", "Laser", "405 nm", "5 mW")
+                                     )
+                    )
+      temp <- rbind(temp, data.frame(Mode = "LSM",
+                                     Category = "Detector",
+                                     Setting = c("Type", "Manufacturer", "Model"),
+                                     Value = c("Multialkali-PMT", "Zeiss", "MA-Pmt1")
+                                     )
+                    )
     }
     return(temp)
   })
@@ -314,9 +380,13 @@ server <- function(input, output) {
   })
 
 
+  #####################################################
 
 
-  # 3.4. Tab Pre-processing
+  ###########################
+  # 3.4. Tab Pre-processing #
+  ###########################
+
   # 3.4.1. Render tab 'proc'
   output$proc <- renderUI({
 
@@ -467,16 +537,20 @@ server <- function(input, output) {
   })
 
 
+  #####################################################
 
 
-  # 3.5. Tab Abbreviations
+  ##########################
+  # 3.5. Tab Abbreviations #
+  ##########################
+
   # 3.5.1. Create output for abbreviations
   # 'reactive()' is necessary to export it
   report_abbr <- reactive({
 
     # Create data.frame() with abbreviations to include in the report, pre-defined
-    data.frame(Abbreviation = c("AU", "HF", "LSM", "NA", "WD", "WF"),
-               Explanation = c("Airy unit", "Hot fix", "Laser-scanning confocal microscopy",
+    data.frame(Abbreviation = c("AU", "B&W", "HF", "LSM", "NA", "WD", "WF"),
+               Explanation = c("Airy unit", "Black and white", "Hot fix", "Laser-scanning confocal microscopy",
                                "Numerical aperture", "Working distance", "Wide-field")
     )
   })
@@ -488,9 +562,13 @@ server <- function(input, output) {
   })
 
 
+  #####################################################
 
 
-  # 3.6. Define what happens when one clicks on the download buttons
+  ####################################################################
+  # 3.6. Define what happens when one clicks on the download buttons #
+  ####################################################################
+
   # 3.6.1. Report ODS
   output$downloadReportODS <- downloadHandler(
 
@@ -547,10 +625,13 @@ server <- function(input, output) {
 }
 
 
-#####
+###############################################################################################################
 
 
-# 4. Run the application
+##########################
+# 4. Run the application #
+##########################
+
 shinyApp(ui = ui, server = server)
 
 
