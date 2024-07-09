@@ -37,7 +37,8 @@ This repository contains a [**Shiny App**](reporting-templates/app.R) that guide
 
 Once all fields are entered, **the report can be exported to an ODS or XLSX file**.  
 
-**This report can and should be published together with the image data.** While publishing them as a supplementary material to a paper is OK, I recommend publishing everything in open access on an online repository like [Zenodo](https://zenodo.org/), [Figshare](https://figshare.com/) or [OSF](https://osf.io/) for easy and long-term accessibility. Additionally or alternatively, the report could be attached to a protocol, for example on [protocols.io](https://www.protocols.io/).
+**This report can and should be published together with the image data.** While publishing them as a supplementary material to a paper is OK, I recommend publishing everything in open access on an online repository like [Zenodo](https://zenodo.org/), [Figshare](https://figshare.com/) or [OSF](https://osf.io/) for easy and long-term accessibility. Additionally or alternatively, the report could be attached to a protocol, for example on [protocols.io](https://www.protocols.io/).  
+For more details, **check my repo** [**publish-micro-image**](https://github.com/ivan-paleo/publish-micro-image).
 
 The App is designed for the instruments available at the [IMPALA](https://www.leiza.de/forschung/infrastrukturen/labore/impala) and currently includes only the digital microscope (Zeiss Smartzoom 5) and the upright light microscope + LSCM (Zeiss Imager.Z2 Vario + LSM 800 MAT). More instruments will be added later.
 
@@ -52,7 +53,7 @@ I am planning to make the App available online on a server, but the App can curr
 
 
 ## Pre-requisites
-The repository and the Shiny App have been written in [RStudio](https://posit.co/products/open-source/rstudio/), so you first need to download and install [R](https://www.r-project.org/) and [RStudio](https://posit.co/download/rstudio-desktop/). But fear not, **no knowledge of R/Rstudio is needed to run the App**!
+The Shiny App is written in [Shiny](https://shiny.posit.co/) using [RStudio](https://posit.co/products/open-source/rstudio/), so you first need to download and install [R](https://www.r-project.org/) and [RStudio](https://posit.co/download/rstudio-desktop/). But fear not, **no knowledge of R/Rstudio is needed to run the App**!
 
 
 ## Download the repository
@@ -93,7 +94,7 @@ There are two ways to get the App:
 ## Introduction
 - In a strict sense, none of the fields are required. Yet, it is important that **you fill as many fields as possible**. Unedited fields will be filled with default values, so make sure you change them in case you did not apply default values.  
 - Some information that will be included in the report (see [tab "Report"](#tab-report)) is hard coded and does not depend on your input because it depends on the hardware only. Because of that (and other things), make sure you **use the latest version of the App**.  
-- **Every entered information summarizes all acquisitions about which you are reporting.** Therefore, do not fill the forms for every single acquisition bur rather for all acquisitions of a project.
+- **Every entered information summarizes all acquisitions about which you are reporting.** Therefore, do not fill the forms for every single acquisition bur rather for all acquisitions of a project. Metadata for every acquisition should be made accessible with the acquisition files themselves (see repo [publish-micro-image](https://github.com/ivan-paleo/publish-micro-image)).
 - While it is possible to jump from any tab to any other, conditional input (i.e. input based on other input) might not update correctly. Therefore, I recommend that you **start in the side bar and then fill in every tab from left ("General") to right ("Pre-processing")**. The tab "Report" can be consulted any time to check how the output will look like.  
 - **You can save the settings for one instrument at a time.**  
 - **Refer to the instrument's user manual if you need information about the settings.**
@@ -127,6 +128,7 @@ If you used more than 1 software packages, enter the versions in the same order 
 ## Tab "Objectives"
 **Select from the list how each objective has been used.**  
 On the Axio Imager.Z2 Vario + LSM 800 MAT:  
+
 - Several uses can be assigned to every objective. To do so, click on every relevant use from the list. 
 - After selection, click on a use and press "DELETE" to unassign it. Make sure that at least one use is assigned to each objective (select "Not used" if you have not used a given objective).
 

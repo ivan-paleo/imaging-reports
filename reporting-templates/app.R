@@ -198,7 +198,7 @@ server <- function(input, output) {
       names(lambda) <- "White LED (550 nm) - WF"
     }
 
-    # Define objectives and settings for LSM
+    # Define objectives and settings for AxioImager
     if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT") {
       obj_na <- c(0.20, 0.40, 0.22, 0.70, 0.55, 0.75, 0.95)
       obj_mag <- c("5x", "10x", "20x", "20x", "50x", "50x", "50x")
@@ -217,6 +217,7 @@ server <- function(input, output) {
     obj_mag_na_string <- paste(obj_mag, format(obj_na, nsmall = 2), sep = "/")
     assign("obj_mag_na", factor(obj_mag_na_string, levels = obj_mag_na_string), envir = .GlobalEnv)
 
+    # Create a list of inputs
     tagList(
       h2("Specify how you used each objective"),
       h5("Make sure to select 'Not used' for the objective(s) you have not used"),
@@ -277,11 +278,21 @@ server <- function(input, output) {
                Use = sapply(seq_along(objectives),
                             function(i) paste(input[[paste0('obj', i)]], collapse = ", ")))
 
+    # If Axio Imager and if 3D topo
     if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT" & any(grepl("3D Topography", input$acq_mode))) {
       temp <- temp %>%
+
+              # Add column deltaL (with a fixed value for lambda)
               mutate(deltaL_LSM = obj_Kna*0.405) %>%
+
+              # Check for each objective if the Nyquist criterion is fulfilled, based on the FOV and Frame size in X
+              # FOV and Frame size in X are set interactively in the tab acquisition (see section 3.3.1)
               mutate(Nyquist_LSM = ifelse(round(input$FOVx / input$FrameX, digits = 3) <= 1/2*deltaL_LSM & round(input$FOVx / input$FrameX, digits = 3) >= 1/3*deltaL_LSM, "Fulfilled", "Not fulfilled")) %>%
+
+              # Set Nyquist to NA if the objective has not been used for 3D topo
               mutate(Nyquist_LSM = ifelse(grepl("3D topography", Use), Nyquist_LSM, NA)) %>%
+
+              # Exclude objectives that have not been used
               filter(Use != "Not used")
     }
 
@@ -290,6 +301,8 @@ server <- function(input, output) {
 
 
   # 3.2.3. Render output for objective settings in the tab "Report" in the table 'obj_set'
+  # digits = 3 is used for rendering. This setting is the one that define the number of decimal places in the table output,
+  # whatever the previous code defines
   output$obj_set <- renderTable({
     report_obj()
   }, digits = 3)
@@ -304,6 +317,8 @@ server <- function(input, output) {
 
   # 3.3.1. Render tab 'acq'
   output$acq <- renderUI({
+
+    # Define settings for Smartzoom
     if (input$instrument == "Smartzoom 5") {
       assign("illum_type", "Reflected light", envir = .GlobalEnv)
       assign("Camera", data.frame(Mode = "WF",
@@ -315,80 +330,149 @@ server <- function(input, output) {
       )
       assign("stack", c("Stepwise", "Continuous"), envir = .GlobalEnv)
     }
+
+    # Define objectives and settings for AxioImager
     if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT") {
       assign("illum_type", c("Reflected light", "Transmitted light"), envir = .GlobalEnv)
       assign("Camera", data.frame(Mode = "WF",
                                   Category = "Camera",
-                                  Setting = c("Type", "Manufacturer", "Model", "Adapter",
-                                              "Camera sensor size", "Camera pixel size"),
-                                  Value = c("CMOS", "Zeiss", "Axiocam 305 color", "1x", "8.5 x 7.1 mm",
-                                            "3.45 x 3.45 µm")
+                                  Setting = c("Type", "Manufacturer", "Model", "Adapter", "Camera sensor size",
+                                              "Camera pixel size"),
+                                  Value = c("CMOS", "Zeiss", "Axiocam 305 color", "1x", "8.5 x 7.1 mm", "3.45 x 3.45 µm")
                                   ),
              envir = .GlobalEnv
       )
       assign("stack", "Stepwise", envir = .GlobalEnv)
     }
+
+    # Create a list of inputs
     tagList(
       h2("WF"),
+
+      # Type of illumination
       selectInput("Illum_type", label = "Type of illumination", choices = illum_type),
+
+      # Z-stack mode
       if (any(input$acq_mode %in% c("EDF", "3D"))) selectInput("zstack", label = "Z-stack mode", choices = stack, selected = "Continuous"),
+
+      # Number of slices for EDF/3D (WF)
+      # COMMENTED OUT FOR NOW (also in section 3.3.2)
+      #if (any(input$acq_mode %in% c("EDF", "3D"))) sliderInput("slices", "Number of slices", min = 1, max = 200,
+      #                                                         value = c(50, 60), width = "100%"),
+
+      # If 3D topo (LSM)
       if (any(grepl("3D Topography", input$acq_mode))) h2("LSM"),
+
+      # Checkbox whether pinhole diameter = 1 AU
       if (any(grepl("3D Topography", input$acq_mode))) checkboxInput("PH", "Pinhole diameter = 1 AU"),
+
+      # Step size
       if (any(grepl("3D Topography", input$acq_mode))) numericInput("Step", label = "Step size [µm]", value = 0.25, min = 0.1),
+
+      # FOV and Frame size (X and Y)
+      # splitLayout is used to have several (here 2) input widgets next to each other, rather than below each other
       if (any(grepl("3D Topography", input$acq_mode))) splitLayout(cellWidths = c("25%", "75%"),
                   numericInput("FOVx", label = "Total image size in X [µm]", value = 200, min = 1),
                   numericInput("FOVy", label = "... and in Y [µm]", value = 200, min = 1)),
       if (any(grepl("3D Topography", input$acq_mode))) splitLayout(cellWidths = c("25%", "75%"),
                   numericInput("FrameX", label = "Total number of pixels in X", value = 2048, min = 1),
                   numericInput("FrameY", label = "... and in Y", value = 2048, min = 1)),
+
+      # renderText is needed to make sure it doesn't overwrite the input value
+      # using e.g. h5() instead results in the impossibility to change the values of
+      # input$FOVx/FOVy/FrameX/FrameY in the widget
       if (any(grepl("3D Topography", input$acq_mode))) renderText({
+
+        # Calculate and show pixel sizes
+        # splitLayout cannot be combined with renderText to paste() is used
+        # paste() does not print tabs nor spaces, so a special invisible symbol ("‎ ") is used to spread the strings
+        # to align with splitLayout(cellWidths = c("25%", "75%")...) from before
         paste("Pixel size in X =", round(input$FOVx / input$FrameX, digits = 3),
               "µm ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎  ... and in Y =",
               round(input$FOVy / input$FrameY, digits = 3), "µm")
       }),
+
+      # Check if pixels are square (i.e. size X = size Y)
       if (any(grepl("3D Topography", input$acq_mode))) renderText({
+
+        # !isTRUE is apparently different from isFALSE
         if (!isTRUE(all.equal(round(input$FOVx / input$FrameX, digits = 3),
                               round(input$FOVy / input$FrameY, digits = 3)))) {
           paste("!! Check the values: the pixels are not square !!")
         }
       }),
+
+      # Display a table with objective, deltaL and whether the Nyquist criterion is fulfilled
       if (any(grepl("3D Topography", input$acq_mode))) renderTable({
         data.frame(Objective = obj_mag_na,
                    Use = sapply(seq_along(objectives),
                                 function(i) paste(input[[paste0('obj', i)]], collapse = ", ")),
                    deltaL = obj_Kna*0.405) %>%
 
+        # Nyquist criterion is fulfilled if pixel size in X is between 1/2 and 1/3 of deltaL
         mutate(Nyquist = ifelse(round(input$FOVx / input$FrameX, digits = 3) <= 1/2*deltaL & round(input$FOVx / input$FrameX, digits = 3) >= 1/3*deltaL, "Fulfilled", "Not fulfilled")) %>%
 
+        # Show only objective(s= used for 3D topo
         filter(grepl("3D topography", Use)) %>%
+
+        # But do not show the column Use
         select(!Use)
+
+      # Number of digits for rendering the table
       }, digits = 3)
     )
   })
 
   # 3.3.2. Create output for acquisition settings
   report_acq <- reactive({
+
+    # WF illumination info
     temp <- data.frame(Mode = "WF",
                        Category = "Illumination",
                        Setting = c("Type", "Source", "Wavelength", "Power"),
                        Value = c(input$Illum_type, "LED", "550 nm (average)", "Unknown"))
+
+    # rbind with WF camera info
     temp <- rbind(temp, Camera)
+
+    # rbind with WF imaging (Z-stack) info, if applicable
     if (any(input$acq_mode %in% c("EDF", "3D"))) {
-      temp <- rbind(temp, c("WF", "Imaging", "Z-stack mode", input$zstack))
+
+      # COMMENTED OUT: Number of slices (see also section 3.3.1)
+      #temp <- rbind(temp, data.frame(Mode = "WF",
+      #                               Category = "Imaging",
+      #                               Setting = c("Z-stack mode", "Number of slices"),
+      #                               Value = c(input$zstack, paste(input$slices, collapse = "-"))
+      #                               )
+      #             )
+      temp <- rbind(temp, data.frame(Mode = "WF",
+                                     Category = "Imaging",
+                                     Setting = c("Z-stack mode"),
+                                     Value = c(input$zstack)
+                                     )
+                    )
     }
+
+    # if 3D topo
     if (any(grepl("3D Topography", input$acq_mode))) {
+
+      # rbind with LSM illumination info
       temp <- rbind(temp, data.frame(Mode = "LSM",
                                      Category = "Illumination",
                                      Setting = c("Type", "Source", "Wavelength", "Power"),
                                      Value = c("Reflected light", "Laser", "405 nm", "5 mW")
                                      )
                     )
+
+      # rbind with LSM detector info
       temp <- rbind(temp, data.frame(Mode = "LSM",
                                      Category = "Detector",
                                      Setting = c("Type", "Manufacturer", "Model"),
                                      Value = c("Multialkali-PMT", "Zeiss", "MA-Pmt1")
                                      )
                     )
+
+      # rbind with LSM imaging info
       temp <- rbind(temp, data.frame(Mode = "LSM",
                                      Category = "Imaging",
                                      Setting = c("FOV", "Frame size", "Pinhole = 1 AU", "Step size"),
@@ -417,18 +501,17 @@ server <- function(input, output) {
   # 3.4.1. Render tab 'proc'
   output$proc <- renderUI({
 
+    # Define settings for the Smartzoom
     if (input$instrument == "Smartzoom 5") {
-      assign("edf_title", "EDF/3D (WF)", envir = .GlobalEnv)
-      assign("edf_set", "Number of slices", envir = .GlobalEnv)
-      assign("edf_set_val", list(edf_num_slices = "NumberSlices"), envir = .GlobalEnv)
       assign("stitch_set", c("Blending", "Stitching Options"), envir = .GlobalEnv)
       assign("stitch_set_val", list(stitch_blend = c("On", "Off"),
                                     stitch_opt = c("Pixel", "Stage")),
                                     envir = .GlobalEnv)
     }
 
+    # Define settings for the Axio Imager
     if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT") {
-      assign("edf_title", "EDF (WF)", envir = .GlobalEnv)
+      #assign("edf_title", "EDF (WF)", envir = .GlobalEnv)
       assign("edf_set", c("Method", "Z-Stack alignment"), envir = .GlobalEnv)
       assign("edf_set_val", list(edf_method = c("Wavelets", "Contrast", "Maximum Projection", "Variance"),
                                  edf_alignment = c("No alignment", "Normal", "High", "Highest")),
@@ -448,21 +531,20 @@ server <- function(input, output) {
       # Only one widget can be rendered within an 'if' call (because of the comma at the end of the widget call?)
       # So 'if' statements are repeated
 
-      # Display message in case no-processing was selected in the tab 'General'
-      if (all(is.null(input$acq_mode) | input$acq_mode == "2D")) h2("No pre-processing applied."),
-      if (all(is.null(input$acq_mode) | input$acq_mode == "2D")) h5("If you did apply some pre-processing, specify it in the tab 'General' and come back to the tab 'Pre-processing' to enter the details."),
+      # Display message in case no-processing was needed
+      # In the tab 'General', no processing was required for:
+      # none, 2D, EDF or 3D (Smartzoom)
+      # none or 2D (Imager Vario)
+      if (all(is.null(input$acq_mode) | input$acq_mode == "2D" | (input$acq_mode %in% c("EDF", "3D") & input$instrument == "Smartzoom 5"))) h2("No pre-processing required."),
+      if (all(is.null(input$acq_mode) | input$acq_mode == "2D" | (input$acq_mode %in% c("EDF", "3D") & input$instrument == "Smartzoom 5"))) h5("If your acquisitions did require some pre-processing, specify it in the tab 'General' and come back to the tab 'Pre-processing' to enter the details."),
 
-      # If EDF/3D was applied
-      if (any(input$acq_mode %in% c("EDF", "3D"))) h2(edf_title),
+      # If EDF was applied on the AxioImager
+      if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT" & any(input$acq_mode == "EDF")) h2("EDF (WF)"),
 
-      # The different microscopes need different types of input (slider vs. select)
+      # Select from list
       if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT" & any(input$acq_mode == "EDF")) {
         lapply(seq_along(edf_set), function(i) selectInput(names(edf_set_val)[i], edf_set[i],
                                                            choices = edf_set_val[[i]]))
-      },
-      if (input$instrument == "Smartzoom 5" & any(input$acq_mode %in% c("EDF", "3D"))) {
-        lapply(seq_along(edf_set), function(i) sliderInput(names(edf_set_val)[i], edf_set[i],
-                                                           min = 1, max = 200, value = c(50, 60), width = "100%"))
       },
 
       # If stitching was applied
@@ -498,22 +580,11 @@ server <- function(input, output) {
 
     # Create data.frame in case no pre-processing was applied.
     # Information will be rbind()ed to it in case pre-processing was applied.
-    temp <- data.frame(Mode = NA, Category = "No pre-processing applied", Setting = NA, Value = NA)
+    temp <- data.frame(Mode = NA, Category = "No pre-processing required", Setting = NA, Value = NA)
 
     # Not all settings are relevant for all microscopes,
     # so output data.frames must be put together differently
     if (input$instrument == "Smartzoom 5") {
-
-      # Add information if EDF/3D was applied
-      if (any(input$acq_mode %in% c("EDF", "3D"))) {
-        temp <- rbind(temp, data.frame(
-                      Mode = "WF",
-                      Category = gsub(" \\(WF\\)$", "", edf_title),
-                      Setting = edf_set,
-                      Value = sapply(seq_along(edf_set_val),
-                                     function(i) paste(input[[names(edf_set_val)[i]]], collapse = "-"))
-        ))
-      }
 
       # Add information if stitching was applied
       if (any(input$acq_mode == "Stitching")) {
@@ -528,10 +599,10 @@ server <- function(input, output) {
     # Only one 'if' call possible within 'reactive()', so 'if... else' was chosen
     # Nested 'if... else' might be needed when more than 2 instruments are available
     } else {
-      if (any(input$acq_mode %in% c("EDF", "3D"))) {
+      if (any(input$acq_mode == "EDF")) {
         temp <- rbind(temp, data.frame(
           Mode = "WF",
-          Category = gsub(" \\(WF\\)$", "", edf_title),
+          Category = "EDF",
           Setting = edf_set,
           Value = sapply(seq_along(edf_set_val), function(i) input[[names(edf_set_val)[i]]])
         ))
@@ -583,7 +654,7 @@ server <- function(input, output) {
     # Create data.frame() with abbreviations to include in the report, pre-defined
     data.frame(Abbreviation = c("AU", "B&W", "HF", "LSM", "NA", "WD", "WF"),
                Explanation = c("Airy unit", "Black and white", "Hot fix", "Laser-scanning confocal microscopy",
-                               "Numerical aperture", "Working distance", "Wide-field")
+                               "Numerical Aperture (or Not Applicable)", "Working distance", "Widefield")
     )
   })
 
