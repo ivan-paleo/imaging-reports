@@ -187,7 +187,7 @@ server <- function(input, output) {
     if (input$instrument == "Smartzoom 5") {
       obj_na <- c(0.1, 0.3)
       obj_mag <- c("1.6x", "5x")
-      obj_Kna <- 0.61/obj_na
+      assign("obj_Kna", 0.61/obj_na, envir = .GlobalEnv)
       assign("objectives",
              paste0("PlanApoD ", obj_mag, " / NA = ", obj_na, " / WD = ", c(36, 30), " mm"),
              envir = .GlobalEnv)
@@ -202,7 +202,7 @@ server <- function(input, output) {
     if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT") {
       obj_na <- c(0.20, 0.40, 0.22, 0.70, 0.55, 0.75, 0.95)
       obj_mag <- c("5x", "10x", "20x", "20x", "50x", "50x", "50x")
-      obj_Kna <- 0.51/obj_na
+      assign("obj_Kna", 0.51/obj_na, envir = .GlobalEnv)
       assign("objectives", paste0("C Epiplan-Apochromat ", obj_mag, " / NA = ",
                            format(obj_na, digits = 2), " / WD = ",
                            c(21, 5.4, 12, 1.3, 9, 1, 0.22)," mm"), envir = .GlobalEnv)
@@ -214,8 +214,8 @@ server <- function(input, output) {
     }
 
     # Combine objectives' magnification and NA
-    obj_mag_na <- paste(obj_mag, format(obj_na, nsmall = 2), sep = "/") %>%
-      factor(., levels = .)
+    obj_mag_na_string <- paste(obj_mag, format(obj_na, nsmall = 2), sep = "/")
+    assign("obj_mag_na", factor(obj_mag_na_string, levels = obj_mag_na_string), envir = .GlobalEnv)
 
     tagList(
       h2("Specify how you used each objective"),
@@ -265,7 +265,7 @@ server <- function(input, output) {
 
   # 3.2.2. Create output for objective settings
   report_obj <- reactive({
-    data.frame(Objective = objectives,
+    temp <- data.frame(Objective = objectives,
 
                # Add column 'Manufacturer'
                Manufacturer = "Carl Zeiss Microscopy GmbH",
@@ -275,17 +275,24 @@ server <- function(input, output) {
 
                # Column 'Use' is based on input$obj1, input$obj2...
                Use = sapply(seq_along(objectives),
-                            function(i) paste(input[[paste0('obj', i)]], collapse = ", "))) %>%
+                            function(i) paste(input[[paste0('obj', i)]], collapse = ", ")))
 
-      # Exclude unused objectives from the report
-      filter(Use != "Not used")
+    if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT" & any(grepl("3D Topography", input$acq_mode))) {
+      temp <- temp %>%
+              mutate(deltaL_LSM = obj_Kna*0.405) %>%
+              mutate(Nyquist_LSM = ifelse(round(input$FOVx / input$FrameX, digits = 3) <= 1/2*deltaL_LSM & round(input$FOVx / input$FrameX, digits = 3) >= 1/3*deltaL_LSM, "Fulfilled", "Not fulfilled")) %>%
+              mutate(Nyquist_LSM = ifelse(grepl("3D topography", Use), Nyquist_LSM, NA)) %>%
+              filter(Use != "Not used")
+    }
+
+  return(temp)
   })
 
 
   # 3.2.3. Render output for objective settings in the tab "Report" in the table 'obj_set'
   output$obj_set <- renderTable({
     report_obj()
-  })
+  }, digits = 3)
 
 
   #####################################################
@@ -306,7 +313,7 @@ server <- function(input, output) {
                                   ),
              envir = .GlobalEnv
       )
-
+      assign("stack", c("Stepwise", "Continuous"), envir = .GlobalEnv)
     }
     if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT") {
       assign("illum_type", c("Reflected light", "Transmitted light"), envir = .GlobalEnv)
@@ -319,27 +326,43 @@ server <- function(input, output) {
                                   ),
              envir = .GlobalEnv
       )
+      assign("stack", "Stepwise", envir = .GlobalEnv)
     }
     tagList(
       h2("WF"),
       selectInput("Illum_type", label = "Type of illumination", choices = illum_type),
-      splitLayout(cellWidths = c("25%", "75%"),
-                  numericInput("FOVx", label = "Total image size in X [µm]", value = 300, min = 1),
+      if (any(input$acq_mode %in% c("EDF", "3D"))) selectInput("zstack", label = "Z-stack mode", choices = stack, selected = "Continuous"),
+      if (any(grepl("3D Topography", input$acq_mode))) h2("LSM"),
+      if (any(grepl("3D Topography", input$acq_mode))) checkboxInput("PH", "Pinhole diameter = 1 AU"),
+      if (any(grepl("3D Topography", input$acq_mode))) numericInput("Step", label = "Step size [µm]", value = 0.25, min = 0.1),
+      if (any(grepl("3D Topography", input$acq_mode))) splitLayout(cellWidths = c("25%", "75%"),
+                  numericInput("FOVx", label = "Total image size in X [µm]", value = 200, min = 1),
                   numericInput("FOVy", label = "... and in Y [µm]", value = 200, min = 1)),
-      splitLayout(cellWidths = c("25%", "75%"),
+      if (any(grepl("3D Topography", input$acq_mode))) splitLayout(cellWidths = c("25%", "75%"),
                   numericInput("FrameX", label = "Total number of pixels in X", value = 2048, min = 1),
                   numericInput("FrameY", label = "... and in Y", value = 2048, min = 1)),
-      splitLayout(cellWidths = c("25%", "75%"),
-                  h5(paste("Pixel size in X =", round(input$FOVx / input$FrameX, digits = 3), "µm")),
-                  h5(paste("Pixel size in Y =", round(input$FOVy / input$FrameY, digits = 3), "µm"))
-                  ),
-      if (!isTRUE(all.equal(round(input$FOVx / input$FrameX, digits = 3),
-                            round(input$FOVy / input$FrameY, digits = 3)))) {
-        h5("Check the values: the pixels are not square")
-      } else {
-        h5("ok")
-      },
-      if (any(grepl("3D Topography", input$acq_mode))) h2("LSM")
+      if (any(grepl("3D Topography", input$acq_mode))) renderText({
+        paste("Pixel size in X =", round(input$FOVx / input$FrameX, digits = 3),
+              "µm ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎  ... and in Y =",
+              round(input$FOVy / input$FrameY, digits = 3), "µm")
+      }),
+      if (any(grepl("3D Topography", input$acq_mode))) renderText({
+        if (!isTRUE(all.equal(round(input$FOVx / input$FrameX, digits = 3),
+                              round(input$FOVy / input$FrameY, digits = 3)))) {
+          paste("!! Check the values: the pixels are not square !!")
+        }
+      }),
+      if (any(grepl("3D Topography", input$acq_mode))) renderTable({
+        data.frame(Objective = obj_mag_na,
+                   Use = sapply(seq_along(objectives),
+                                function(i) paste(input[[paste0('obj', i)]], collapse = ", ")),
+                   deltaL = obj_Kna*0.405) %>%
+
+        mutate(Nyquist = ifelse(round(input$FOVx / input$FrameX, digits = 3) <= 1/2*deltaL & round(input$FOVx / input$FrameX, digits = 3) >= 1/3*deltaL, "Fulfilled", "Not fulfilled")) %>%
+
+        filter(grepl("3D topography", Use)) %>%
+        select(!Use)
+      }, digits = 3)
     )
   })
 
@@ -350,13 +373,9 @@ server <- function(input, output) {
                        Setting = c("Type", "Source", "Wavelength", "Power"),
                        Value = c(input$Illum_type, "LED", "550 nm (average)", "Unknown"))
     temp <- rbind(temp, Camera)
-    temp <- rbind(temp, data.frame(Mode = "WF",
-                                   Category = "Image",
-                                   Setting = c("FOV", "Frame size"),
-                                   Value = c(paste(input$FOVx, "x", input$FOVy, "µm"),
-                                             paste(input$FrameX, "x", input$FrameY, "pixels"))
-                                   )
-                  )
+    if (any(input$acq_mode %in% c("EDF", "3D"))) {
+      temp <- rbind(temp, c("WF", "Imaging", "Z-stack mode", input$zstack))
+    }
     if (any(grepl("3D Topography", input$acq_mode))) {
       temp <- rbind(temp, data.frame(Mode = "LSM",
                                      Category = "Illumination",
@@ -368,6 +387,14 @@ server <- function(input, output) {
                                      Category = "Detector",
                                      Setting = c("Type", "Manufacturer", "Model"),
                                      Value = c("Multialkali-PMT", "Zeiss", "MA-Pmt1")
+                                     )
+                    )
+      temp <- rbind(temp, data.frame(Mode = "LSM",
+                                     Category = "Imaging",
+                                     Setting = c("FOV", "Frame size", "Pinhole = 1 AU", "Step size"),
+                                     Value = c(paste(input$FOVx, "x", input$FOVy, "µm"),
+                                               paste(input$FrameX, "x", input$FrameY, "pixels"),
+                                               input$PH, paste(input$Step, "µm"))
                                      )
                     )
     }
@@ -471,7 +498,7 @@ server <- function(input, output) {
 
     # Create data.frame in case no pre-processing was applied.
     # Information will be rbind()ed to it in case pre-processing was applied.
-    temp <- data.frame(Category = "No pre-processing applied", Setting = NA, Value = NA)
+    temp <- data.frame(Mode = NA, Category = "No pre-processing applied", Setting = NA, Value = NA)
 
     # Not all settings are relevant for all microscopes,
     # so output data.frames must be put together differently
@@ -480,7 +507,8 @@ server <- function(input, output) {
       # Add information if EDF/3D was applied
       if (any(input$acq_mode %in% c("EDF", "3D"))) {
         temp <- rbind(temp, data.frame(
-                      Category = rep(edf_title, length(edf_set)),
+                      Mode = "WF",
+                      Category = gsub(" \\(WF\\)$", "", edf_title),
                       Setting = edf_set,
                       Value = sapply(seq_along(edf_set_val),
                                      function(i) paste(input[[names(edf_set_val)[i]]], collapse = "-"))
@@ -490,7 +518,8 @@ server <- function(input, output) {
       # Add information if stitching was applied
       if (any(input$acq_mode == "Stitching")) {
         temp <- rbind(temp, data.frame(
-                      Category = rep("Stitching (WF)", length(stitch_set)),
+                      Mode = "WF",
+                      Category = "Stitching",
                       Setting = stitch_set,
                       Value = sapply(seq_along(stitch_set_val), function(i) input[[names(stitch_set_val)[i]]])
         ))
@@ -501,14 +530,16 @@ server <- function(input, output) {
     } else {
       if (any(input$acq_mode %in% c("EDF", "3D"))) {
         temp <- rbind(temp, data.frame(
-          Category = rep(edf_title, length(edf_set)),
+          Mode = "WF",
+          Category = gsub(" \\(WF\\)$", "", edf_title),
           Setting = edf_set,
           Value = sapply(seq_along(edf_set_val), function(i) input[[names(edf_set_val)[i]]])
         ))
       }
       if (any(input$acq_mode == "Stitching")) {
         temp <- rbind(temp, data.frame(
-          Category = rep("Stitching (WF)", length(stitch_set) + 2),
+          Mode = "WF",
+          Category = "Stitching",
           Setting = c(stitch_set, "Minimal Overlap [%]", "Maximal Shift [%]"),
           Value = c(sapply(seq_along(stitch_set_val), function(i) input[[names(stitch_set_val)[i]]]),
                     input$stitch_overlap, input$stitch_shift)
@@ -516,7 +547,8 @@ server <- function(input, output) {
       }
       if (any(input$acq_mode == "3D Topography")) {
         temp <- rbind(temp, data.frame(
-          Category = "Topography (LSM)",
+          Mode = "LSM",
+          Category = "Topography",
           Setting = "Data quality (Noise Cut)",
           Value = paste0(input$topo_noise_low, "-", input$topo_noise_high, " levels")
         ))
