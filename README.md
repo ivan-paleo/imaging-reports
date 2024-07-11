@@ -40,7 +40,7 @@ Once all fields are entered, **the report can be exported to an ODS or XLSX file
 **This report can and should be published together with the image data.** While publishing them as a supplementary material to a paper is OK, I recommend publishing everything in open access on an online repository like [Zenodo](https://zenodo.org/), [Figshare](https://figshare.com/) or [OSF](https://osf.io/) for easy and long-term accessibility. Additionally or alternatively, the report could be attached to a protocol, for example on [protocols.io](https://www.protocols.io/).  
 For more details, **check my repo** [**publish-micro-image**](https://github.com/ivan-paleo/publish-micro-image).
 
-The App is designed for the instruments available at the [IMPALA](https://www.leiza.de/forschung/infrastrukturen/labore/impala) and currently includes only the digital microscope (Zeiss Smartzoom 5) and the upright light microscope + LSCM (Zeiss Imager.Z2 Vario + LSM 800 MAT). More instruments will be added later.
+The App is designed for the instruments available at the [IMPALA](https://www.leiza.de/forschung/infrastrukturen/labore/impala) and currently includes only the digital microscope (Zeiss Smartzoom 5) and the upright light microscope + LSCM (Zeiss Axio Imager.Z2 Vario + LSM 800 MAT, abbreviated "LSM"). More instruments will be added later.
 
 If you would like to adapt the App to your instrument(s), check the sections [How to adapt the App](#how-to-adapt-the-app), [How to contribute](#how-to-contribute) and [License](#license).
 
@@ -58,7 +58,7 @@ The Shiny App is written in [Shiny](https://shiny.posit.co/) using [RStudio](htt
 
 ## Download the repository
 There are two ways to get the App: 
-1. Download my [GitHub repository](https://github.com/ivan-paleo/reporting-templates/archive/refs/heads/main.zip) or its latest [release](https://github.com/ivan-paleo/reporting-templates/releases) as a ZIP archive, and unzip it.  
+1. Download my [GitHub repository](https://github.com/ivan-paleo/reporting-templates/archive/refs/heads/main.zip) or its latest [release](https://github.com/ivan-paleo/reporting-templates/releases) as a ZIP archive, and unzip it. You can access the repository with the source code by clicking on the button in the side bar of the APp (see [side bar](#side-bar)).  
 2. [Fork and clone](https://happygitwithr.com/fork-and-clone.html) my GitHub repository.
 
 ## Start the App
@@ -77,7 +77,7 @@ There are two ways to get the App:
 >    <i>Run the App from within RStudio.</i>
 ></p>
 
-4.  The App will open in a new RStudio window. Alternatively, click on `Open in Browser` at the top to open the App within your favorite browser (Firefox, Chrome...). It does not make much difference, though, whether the App is opened in RStudio or in the browser.
+4.  The App will open in a new RStudio window. I recommend to open the App in your browser (click on `Open in Browser` at the top to open the App), and to maximize the window.
 
 ><p align="center" width="100%">
 >    <img src="screenshots/app_general_LSM_empty.png"><br>
@@ -103,6 +103,8 @@ There are two ways to get the App:
 ## Side bar
 **Enter your name and select the instrument you used from the list.**  
 Start again at the tab "General" if you switch to another instrument.
+
+Click on the GitHub button to access the repository with the source code.
 
 ><p align="center">
 >    <img src="screenshots/app_sidebar.png"><br>
@@ -154,7 +156,35 @@ The graph can be exported to PDF or PNG using the buttons below.
 
 
 ## Tab "Acquisition"
-WIP
+On the Axio Imager.Z2 Vario + LSM 800 MAT:  
+
+- Choose the type of illumination: reflected or transmitted.  
+- There is only one z-stack mode to choose from: Stepwise.  
+
+><p align="center" width="100%">
+>    <img src="screenshots/app_acq_LSM.png"><br>
+>    <i>Acquisition tab for the Axio Imager.Z2 Vario + LSM 800 MAT.</i>
+></p>
+
+- In case of an LSM acquisition ("3D topography"): 
+
+  - Enter the information for the objective used for this type of acquisition.    
+  - Tick the box "Pinhole diameter = 1 AU" to confirm that the pinhole diameter was set properly.  
+  - Enter the step size, the image size in X and Y, and the number of pixels in X and Y for the total image in case stitching was used. **It is currently not possible to enter these pieces of information for several objectives.**   
+  - The pixel size in X and Y is calculated and showed interactively below, as well as whether the Nyquist criterion is fulfilled for this objective. The Nyquist criterion is fulfilled when the pixel size is 2 to 3 times smaller than the lateral optical resolution (see tab [Objectives](#objectives)).  
+  - In case the pixel size in X and Y differ, a warning will be displayed that the pixels are not square. The detector can only acquire square pixels, so at least one of the values you entered has to be wrong.
+  
+><p align="center" width="100%">
+>    <img src="screenshots/app_acq_square-pixels.png"><br>
+>    <i>Warning about square pixels for the Axio Imager.Z2 Vario + LSM 800 MAT.</i>
+></p> 
+
+On the Smartzoom 5: the only thing to choose is the z-stack mode ("Continuous" or "Stepwise"). The type of illumination is only shown but this microscope can only use reflected light.
+
+><p align="center" width="100%">
+>    <img src="screenshots/app_acq_SZ.png"><br>
+>    <i>Acquisition tab for the Smartzoom 5.</i>
+></p>
 
 
 ## Tab "Pre-processing"
@@ -198,7 +228,15 @@ Once done, click on the `Download Report to ODS` or `Download Report to XLSX` bu
 
 **Save one report for each instrument you used.**
 
-*WIP: Screenshots will be added later.*
+><p align="center" width="100%">
+>    <img src="screenshots/app_report_LSM.png"><br>
+>    <i>Example report with the Axio Imager.Z2 Vario + LSM 800 MAT.</i>
+></p>
+
+><p align="center" width="100%">
+>    <img src="screenshots/app_report_SZ.png"><br>
+>    <i>Example report with the Smartzoom 5.</i>
+></p>
 
 
 ---

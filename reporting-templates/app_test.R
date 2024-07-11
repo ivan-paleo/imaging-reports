@@ -290,7 +290,7 @@ server <- function(input, output) {
       temp <- temp %>%
 
         # Add column deltaL (with a fixed value for lambda)
-        mutate(deltaL_LSM = obj_Kna*0.405) %>%
+        mutate(deltaL_LSM = obj_Kna*0.405, Objective2 = obj_mag_na) %>%
 
         # Check for each objective if the Nyquist criterion is fulfilled, based on the FOV and Frame size in X
         # FOV and Frame size in X are set interactively in the tab acquisition (see section 3.3.1)
@@ -311,7 +311,7 @@ server <- function(input, output) {
   # digits = 3 is used for rendering. This setting is the one that define the number of decimal places in the table output,
   # whatever the previous code defines
   output$obj_set <- renderTable({
-    report_obj()
+    select(report_obj(), !Objective2)
   }, digits = 3)
 
 
@@ -323,8 +323,9 @@ server <- function(input, output) {
       filter(grepl("3D topography", Use)) %>%
 
       # But do not show the column Use
-      select(Objective, deltaL_LSM, Nyquist_LSM)
+      select(Objective2, deltaL_LSM, Nyquist_LSM)
 
+    assign("obj_topo", temp$Objective2, envir = .GlobalEnv)
     return(temp)
   })
 
@@ -392,6 +393,16 @@ server <- function(input, output) {
 
       # Checkbox whether pinhole diameter = 1 AU
       if (any(grepl("3D Topography", input$acq_mode))) checkboxInput("PH", "Pinhole diameter = 1 AU"),
+
+      # for some reason, all objectives except the unused ones are listed
+      if (any(grepl("3D Topography", input$acq_mode))) {
+        lapply(obj_topo, function(i) {
+          checkboxInput(paste0("PH", i), paste("Pinhole diameter", i, "= 1 AU"))
+        })
+      },
+
+      # but here it is fine
+      if (any(grepl("3D Topography", input$acq_mode))) renderText(paste(obj_topo)),
 
       # Step size
       if (any(grepl("3D Topography", input$acq_mode))) numericInput("Step", label = "Step size [µm]",
