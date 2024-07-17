@@ -1,6 +1,6 @@
 
 <!-- TOC ignore:true -->
-# reporting-templates
+# imaging-reports
 
 <!-- TOC ignore:true -->
 ## Table of content
@@ -33,7 +33,7 @@
 
 # Purpose
 
-This repository contains a [**Shiny App**](reporting-templates/app.R) that guides users to **create a report for microscope images acquired at the Imaging Platform at LEIZA ([IMPALA](https://www.leiza.de/forschung/infrastrukturen/labore/impala)) with all the necessary metadata.**
+This repository contains a [**Shiny App**](imaging-reports/app.R) that guides users to **create a report for microscope images acquired at the Imaging Platform at LEIZA ([IMPALA](https://www.leiza.de/forschung/infrastrukturen/labore/impala)) with all the necessary metadata.**
 
 Once all fields are entered, **the report can be exported to an ODS or XLSX file**.  
 
@@ -58,12 +58,12 @@ The Shiny App is written in [Shiny](https://shiny.posit.co/) using [RStudio](htt
 
 ## Download the repository
 There are two ways to get the App: 
-1. Download my [GitHub repository](https://github.com/ivan-paleo/reporting-templates/archive/refs/heads/main.zip) or its latest [release](https://github.com/ivan-paleo/reporting-templates/releases) as a ZIP archive, and unzip it. You can access the repository with the source code by clicking on the button in the side bar of the APp (see [side bar](#side-bar)).  
+1. Download my [GitHub repository](https://github.com/ivan-paleo/imaging-reports/archive/refs/heads/main.zip) or its latest [release](https://github.com/ivan-paleo/imaging-reports/releases) as a ZIP archive, and unzip it. You can access the repository with the source code by clicking on the button in the side bar of the APp (see [side bar](#side-bar)).  
 2. [Fork and clone](https://happygitwithr.com/fork-and-clone.html) my GitHub repository.
 
 ## Start the App
-1.  Open the file [reporting-templates.Rproj](reporting-templates.Rproj) with RStudio.
-2.  Open the file `reporting-templates/app.R` from within RStudio by clicking on it in the `Files` panel.
+1.  Open the file [imaging-reports.Rproj](imaging-reports.Rproj) with RStudio.
+2.  Open the file `imaging-reports/app.R` from within RStudio by clicking on it in the `Files` panel.
 
 ><p align="center" width="100%">
 >    <img src="screenshots/open_app.png"><br>
@@ -255,7 +255,7 @@ If you would like to adapt the App to your instrument(s), feel free to do so on 
 I appreciate any comment from anyone (expert or novice) to improve this App, so do not be shy!  
 There are three possibilities to contribute.
 
-1.  Submit an issue: If you notice any problem or have a question, submit an [issue](https://docs.github.com/en/issues/tracking-your-work-with-issues/about-issues). You can do so [here](https://github.com/ivan-paleo/reporting-templates/issues).  
+1.  Submit an issue: If you notice any problem or have a question, submit an [issue](https://docs.github.com/en/issues/tracking-your-work-with-issues/about-issues). You can do so [here](https://github.com/ivan-paleo/imaging-reports/issues).  
 2.  Propose changes: If you know how to write a [Shiny App](https://shiny.rstudio.com/), please propose text edits as a [pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests) (abbreviated "PR").
 3.  Send me an email: For options 1-2, you need to create a GitHub account. If you do not have one and do not want to sign up, you can still write me an email (Google me to find my email address).
 

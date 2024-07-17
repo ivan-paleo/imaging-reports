@@ -46,9 +46,9 @@ ui <- fluidPage(
       # Credit
       splitLayout(cellWidths = c("25%", "75%"),
                   h5("By Ivan Calandra"),
-                  actionButton("GitHub", "reporting-templates",
+                  actionButton("GitHub", "imaging-reports",
                                icon = icon("github", lib = "font-awesome"),
-                               onclick = "window.open('https://github.com/ivan-paleo/reporting-templates', '_blank')"))
+                               onclick = "window.open('https://github.com/ivan-paleo/imaging-reports', '_blank')"))
     ),
 
     # 2.3. Main panel
