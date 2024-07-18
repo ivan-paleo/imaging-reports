@@ -31,6 +31,13 @@
 ---
 
 
+*The releases are available and citable on Zenodo*\
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.12770368.svg)](https://doi.org/10.5281/zenodo.12770368)
+
+
+---
+
+
 # Purpose
 
 This repository contains a [**Shiny App**](imaging-reports/app.R) that guides users to **create a report for microscope images acquired at the Imaging Platform at LEIZA ([IMPALA](https://www.leiza.de/forschung/infrastrukturen/labore/impala)) with all the necessary metadata.**
