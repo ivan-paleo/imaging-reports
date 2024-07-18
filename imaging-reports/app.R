@@ -297,12 +297,14 @@ server <- function(input, output) {
         mutate(Nyquist_LSM = ifelse(round(input$FOVx / input$FrameX, digits = 3) <= 1/2*deltaL_LSM & round(input$FOVx / input$FrameX, digits = 3) >= 1/3*deltaL_LSM, "Fulfilled", "Not fulfilled")) %>%
 
         # Set Nyquist to NA if the objective has not been used for 3D topo
-        mutate(Nyquist_LSM = ifelse(grepl("3D topography", Use), Nyquist_LSM, NA)) %>%
-
-        # Exclude objectives that have not been used
-        filter(Use != "Not used")
+        mutate(Nyquist_LSM = ifelse(grepl("3D topography", Use), Nyquist_LSM, NA))
     }
 
+    # Exclude objectives that have not been used
+    temp <- temp %>%
+            filter(Use != "Not used")
+
+    # Return output
     return(temp)
   })
 
@@ -348,19 +350,16 @@ server <- function(input, output) {
 
     # Define settings for Smartzoom
     if (input$instrument == "Smartzoom 5") {
-      assign("illum_type", "Reflected light", envir = .GlobalEnv)
       assign("Camera", data.frame(Mode = "WF",
                                   Category = "Camera",
                                   Setting = c("Type", "Adapter", "Camera sensor size"),
                                   Value = c("CMOS", "1x", "1''")
                                   ), envir = .GlobalEnv
       )
-      assign("stack", c("Stepwise", "Continuous"), envir = .GlobalEnv)
     }
 
     # Define objectives and settings for AxioImager
     if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT") {
-      assign("illum_type", c("Reflected light", "Transmitted light"), envir = .GlobalEnv)
       assign("Camera", data.frame(Mode = "WF",
                                   Category = "Camera",
                                   Setting = c("Type", "Manufacturer", "Model", "Adapter", "Camera sensor size",
@@ -369,18 +368,21 @@ server <- function(input, output) {
       ),
       envir = .GlobalEnv
       )
-      assign("stack", "Stepwise", envir = .GlobalEnv)
     }
 
     # Create a list of inputs
     tagList(
       h2("WF"),
 
-      # Type of illumination
-      selectInput("Illum_type", label = "Type of illumination", choices = illum_type),
+      # Type of illumination for Axio Imager only
+      if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT") {
+        selectInput("Illum_type", label = "Type of illumination", choices = c("Reflected light", "Transmitted light"))
+      },
 
       # Z-stack mode
-      if (any(input$acq_mode %in% c("EDF", "3D"))) selectInput("zstack", label = "Z-stack mode", choices = stack, selected = "Continuous"),
+      if (any(input$acq_mode %in% c("EDF", "3D")) & input$instrument == "Smartzoom 5") {
+        selectInput("zstack", label = "Z-stack mode", choices = c("Stepwise", "Continuous"), selected = "Continuous")
+      },
 
       # Number of slices for EDF/3D (WF)
       # COMMENTED OUT FOR NOW (also in section 3.3.2)
@@ -442,16 +444,28 @@ server <- function(input, output) {
   report_acq <- reactive({
 
     # WF illumination info
-    temp <- data.frame(Mode = "WF",
-                       Category = "Illumination",
-                       Setting = c("Type", "Source", "Wavelength", "Power"),
-                       Value = c(input$Illum_type, "LED", "550 nm (average)", "Unknown"))
+    # For Axio Imager
+    if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT") {
+      temp <- data.frame(Mode = "WF",
+                         Category = "Illumination",
+                         Setting = c("Type", "Source", "Wavelength", "Power"),
+                         Value = c(input$Illum_type, "LED", "550 nm (average)", "Unknown"))
+    }
+
+    # For Smartzoom
+    if (input$instrument == "Smartzoom 5") {
+      temp <- data.frame(Mode = "WF",
+                         Category = "Illumination",
+                         Setting = c("Type", "Source", "Wavelength", "Power"),
+                         Value = c("Reflected light", "LED", "550 nm (average)", "Unknown"))
+    }
 
     # rbind with WF camera info
     temp <- rbind(temp, Camera)
 
     # rbind with WF imaging (Z-stack) info, if applicable
-    if (any(input$acq_mode %in% c("EDF", "3D"))) {
+    # For the Smartzoom
+    if (any(input$acq_mode %in% c("EDF", "3D")) & input$instrument == "Smartzoom 5") {
 
       # COMMENTED OUT: Number of slices (see also section 3.3.1)
       #temp <- rbind(temp, data.frame(Mode = "WF",
@@ -464,8 +478,18 @@ server <- function(input, output) {
                                      Category = "Imaging",
                                      Setting = c("Z-stack mode"),
                                      Value = c(input$zstack)
-      )
-      )
+                                     )
+                   )
+    }
+
+    # For all other instruments
+    if (any(input$acq_mode %in% c("EDF", "3D")) & input$instrument != "Smartzoom 5") {
+      temp <- rbind(temp, data.frame(Mode = "WF",
+                                     Category = "Imaging",
+                                     Setting = c("Z-stack mode"),
+                                     Value = "Stepwise"
+                                     )
+                   )
     }
 
     # if 3D topo
