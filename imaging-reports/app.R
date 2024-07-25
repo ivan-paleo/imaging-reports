@@ -38,7 +38,7 @@ ui <- fluidPage(
 
       # Selection box to select the instrument for which the report will be created
       selectInput("instrument", "Choose the instrument",
-                  c("Axio Imager.Z2 Vario + LSM 800 MAT", "Smartzoom 5")),
+                  c("Axio Imager.Z2 Vario + LSM 800 MAT", "Smartzoom 5", "Axio Scope.A1")),
 
       # LEIZA logo
       img(src = "Leiza_Logo_Deskriptor_CMYK_rot_LEIZA.png", height = 150),
@@ -106,21 +106,29 @@ server <- function(input, output) {
   output$general <- renderUI({
 
     # create objects with different values depending on the instrument
+    # Smartzoom 5
     if (input$instrument == "Smartzoom 5") {
       soft <- c("Smartzoom", "ZEN core")
       acq_modes <- c("2D", "EDF", "3D", "Stitching")
 
       # Must be assigned to global environment so that it can be used outside of renderUI()
       # and inside 'report_general'
-      assign("setup", "Steel table on solid concrete base", envir = .GlobalEnv)
-      assign("maintenance", data.frame(Category = "Maintenance", Setting = "NA", Value = "NA"),
-             envir = .GlobalEnv)
+      assign("setup", c("Location", "Setup", "Steel table on solid concrete base"), envir = .GlobalEnv)
     }
+
+    # Axio Scope.A1
+    if (input$instrument == "Axio Scope.A1") {
+      soft <- c("ZEN core", "Helicon Focus")
+      acq_modes <- c("2D", "EDF", "Panorama")
+    }
+
+    # Axio Imager.Z2 Vario + LSM 800 MAT
     if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT") {
       soft <- c("ZEN blue", "ZEN core")
-      acq_modes <- c("2D", "3D Topography", "EDF", "Stitching")
-      assign("setup", "Passive anti-vibration table on solid concrete base", envir = .GlobalEnv)
-      assign("maintenance", data.frame(Category = rep("Maintenance", 3),
+      acq_modes <- c("2D", "EDF", "3D Topography", "Stitching")
+      assign("setup", c("Location", "Setup", "Passive anti-vibration table on solid concrete base"),
+             envir = .GlobalEnv)
+      assign("maintenance", data.frame(Category = "Maintenance",
                                        Setting = c("Last yearly inspection and calibration by manufacturer",
                                                    "Last topography correction for used objectives",
                                                    "Last control for used objectives with the roughness standard (nominal Ra = 0.40 ± 0.05 µm)"),
@@ -139,7 +147,9 @@ server <- function(input, output) {
       textInput("version", "Software version", "v2.6 HF12"),
 
       # Check box whether Shuttle-and-Find module was used
-      checkboxInput("sf", "Shuttle-and-Find module used", FALSE),
+      if (input$instrument %in% c("Smartzoom 5", "Axio Imager.Z2 Vario + LSM 800 MAT")) {
+        checkboxInput("sf", "Shuttle-and-Find module used", FALSE)
+      },
 
       # Check boxes to select which acquisition mode(s) was (were) used
       # Possible values come from 'acq_modes'
@@ -152,24 +162,44 @@ server <- function(input, output) {
   # 'reactive()' is necessary to use input values from above and to export it
   report_general <- reactive({
 
+    # Software + version
     paste_ver <- unlist(strsplit(input$version, ";"))
-    paste_sf <- paste0(", Shuttle-and-Find: ",  input$sf)
-    soft_out <- paste0(paste(input$software, paste_ver, collapse = ", "), paste_sf)
+    if (input$instrument %in% c("Smartzoom 5", "Axio Imager.Z2 Vario + LSM 800 MAT")) {
+      soft_out <- paste0(", Shuttle-and-Find: ",  input$sf) %>%
+                  paste0(paste(input$software, paste_ver, collapse = ", "), .)
+    } else {
+      soft_out <- paste(input$software, paste_ver, collapse = ", ")
+    }
 
     # Create data.frame() with information to include in the report
     # Some information is user input, other is pre-defined
     temp <- data.frame(
-      Category = c("User", "Microscope", "Microscope", "Location", "Location", "Location",
-                   "Software", "Acquisition modes"),
-      Setting = c("Name", "Manufacturer", "Model", "Facility", "Floor", "Setup",
-                  "Software, version and modules", ""),
+      Category = c("User", "Microscope", "Microscope", "Location", "Location",
+                   "Software", "Acquisition"),
+      Setting = c("Name", "Manufacturer", "Model", "Facility", "Floor",
+                  "Software, version and modules", "Modes"),
       Value = c(input$name, "Carl Zeiss Microscopy GmbH", input$instrument,
                 "IMPALA, MONREPOS, Germany",
-                "-1 (basement)", setup,
-                soft_out,
+                "-1 (basement)", soft_out,
                 paste(input$acq_mode, collapse = ", "))
     )
-    rbind(temp, maintenance)
+
+    # rbind with setup if appropriate
+    if (input$instrument %in% c("Smartzoom 5", "Axio Imager.Z2 Vario + LSM 800 MAT")) {
+      temp <- rbind(temp, setup)
+    }
+
+    # rbind with maintenance if appropriate
+    if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT") {
+      temp <- rbind(temp, maintenance)
+    }
+
+    # convert Category to factor in order to sort the rows
+    temp$Category <- factor(temp$Category, levels = c("User", "Microscope", "Software", "Location", "Acquisition"))
+    temp <- arrange(temp, Category, Setting)
+
+    # return temp
+    return(temp)
   })
 
 
@@ -190,7 +220,22 @@ server <- function(input, output) {
   # 3.2.1. Render tab 'obj'
   output$obj <- renderUI({
 
-    # Define objectives and settings for Smartzoom
+    # Define objectives and settings for Axio Scope.A1
+    if (input$instrument == "Axio Scope.A1") {
+      obj_na <- c(0.13, 0.25, 0.40, 0.75)
+      obj_mag <- c("5x", "10x", "20x", "50x")
+      assign("obj_Kna", 0.61/obj_na, envir = .GlobalEnv)
+      assign("objectives",
+             paste0("EC Epiplan ", obj_mag, " / NA = ", obj_na, " / WD = ", c(11.8, 11, 3.2, 1), " mm"),
+             envir = .GlobalEnv)
+      obj_use <- c("Color image", "Not used")
+      sel_multi <- FALSE
+      sel_value <- "Not used"
+      lambda <- 550
+      names(lambda) <- "White LED (550 nm) - WF"
+    }
+
+    # Define objectives and settings for Smartzoom 5
     if (input$instrument == "Smartzoom 5") {
       obj_na <- c(0.1, 0.3)
       obj_mag <- c("1.6x", "5x")
@@ -205,7 +250,7 @@ server <- function(input, output) {
       names(lambda) <- "White LED (550 nm) - WF"
     }
 
-    # Define objectives and settings for AxioImager
+    # Define objectives and settings for Axio Imager.Z2 Vario + LSM 800 MAT
     if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT") {
       obj_na <- c(0.20, 0.40, 0.22, 0.70, 0.55, 0.75, 0.95)
       obj_mag <- c("5x", "10x", "20x", "20x", "50x", "50x", "50x")
@@ -348,7 +393,7 @@ server <- function(input, output) {
   # 3.3.1. Render tab 'acq'
   output$acq <- renderUI({
 
-    # Define settings for Smartzoom
+    # Define settings for Smartzoom 5
     if (input$instrument == "Smartzoom 5") {
       assign("Camera", data.frame(Mode = "WF",
                                   Category = "Camera",
@@ -358,8 +403,8 @@ server <- function(input, output) {
       )
     }
 
-    # Define objectives and settings for AxioImager
-    if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT") {
+    # Define settings for Axio Imager.Z2 Vario + LSM 800 MAT and Axio Scope.A1
+    if (input$instrument %in% c("Axio Imager.Z2 Vario + LSM 800 MAT", "Axio Scope.A1")) {
       assign("Camera", data.frame(Mode = "WF",
                                   Category = "Camera",
                                   Setting = c("Type", "Manufacturer", "Model", "Adapter", "Camera sensor size",
@@ -372,14 +417,27 @@ server <- function(input, output) {
 
     # Create a list of inputs
     tagList(
-      h2("WF"),
 
-      # Type of illumination for Axio Imager only
+      # Axio Scope.A1
+      if (all((is.null(input$acq_mode) | input$acq_mode %in% c("EDF", "2D"))) & input$instrument == "Axio Scope.A1") {
+        h5("No input required.")
+      },
+      if (any(input$acq_mode == "Panorama") & input$instrument == "Axio Scope.A1") h2("Panorama"),
+      if (any(input$acq_mode == "Panorama") & input$instrument == "Axio Scope.A1") {
+        selectInput("panorama", label = "Panorama mode", choices = c("Automatic", "Interactive"), selected = "Automatic")
+      },
+
+      # Axio Imager.Z2 Vario + LSM 800 MAT
+      if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT") h2("WF"),
       if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT") {
         selectInput("Illum_type", label = "Type of illumination", choices = c("Reflected light", "Transmitted light"))
       },
 
-      # Z-stack mode
+      # Smartzoom 5
+      if (all((is.null(input$acq_mode) | input$acq_mode %in% c("Stitching", "2D"))) & input$instrument == "Smartzoom 5") {
+        h5("No input required.")
+      },
+      if (any(input$acq_mode %in% c("EDF", "3D")) & input$instrument == "Smartzoom 5") h2("WF"),
       if (any(input$acq_mode %in% c("EDF", "3D")) & input$instrument == "Smartzoom 5") {
         selectInput("zstack", label = "Z-stack mode", choices = c("Stepwise", "Continuous"), selected = "Continuous")
       },
@@ -444,7 +502,7 @@ server <- function(input, output) {
   report_acq <- reactive({
 
     # WF illumination info
-    # For Axio Imager
+    # For Axio Imager.Z2 Vario + LSM 800 MAT
     if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT") {
       temp <- data.frame(Mode = "WF",
                          Category = "Illumination",
@@ -452,8 +510,8 @@ server <- function(input, output) {
                          Value = c(input$Illum_type, "LED", "550 nm (average)", "Unknown"))
     }
 
-    # For Smartzoom
-    if (input$instrument == "Smartzoom 5") {
+    # For Smartzoom 5 and Axio Scope.A1
+    if (input$instrument %in% c("Smartzoom 5", "Axio Scope.A1")) {
       temp <- data.frame(Mode = "WF",
                          Category = "Illumination",
                          Setting = c("Type", "Source", "Wavelength", "Power"),
@@ -464,7 +522,7 @@ server <- function(input, output) {
     temp <- rbind(temp, Camera)
 
     # rbind with WF imaging (Z-stack) info, if applicable
-    # For the Smartzoom
+    # For the Smartzoom 5
     if (any(input$acq_mode %in% c("EDF", "3D")) & input$instrument == "Smartzoom 5") {
 
       # COMMENTED OUT: Number of slices (see also section 3.3.1)
@@ -476,8 +534,8 @@ server <- function(input, output) {
       #             )
       temp <- rbind(temp, data.frame(Mode = "WF",
                                      Category = "Imaging",
-                                     Setting = c("Z-stack mode"),
-                                     Value = c(input$zstack)
+                                     Setting = "Z-stack mode",
+                                     Value = input$zstack
                                      )
                    )
     }
@@ -486,8 +544,19 @@ server <- function(input, output) {
     if (any(input$acq_mode %in% c("EDF", "3D")) & input$instrument != "Smartzoom 5") {
       temp <- rbind(temp, data.frame(Mode = "WF",
                                      Category = "Imaging",
-                                     Setting = c("Z-stack mode"),
+                                     Setting = "Z-stack mode",
                                      Value = "Stepwise"
+                                     )
+                   )
+    }
+
+    # For Axio Scope.A1
+    # rbind with panorama mode
+    if (any(input$acq_mode == "Panorama") & input$instrument == "Axio Scope.A1") {
+      temp <- rbind(temp, data.frame(Mode = "WF",
+                                     Category = "Imaging",
+                                     Setting = "Panorama mode",
+                                     Value = input$panorama
                                      )
                    )
     }
@@ -573,11 +642,15 @@ server <- function(input, output) {
       # So 'if' statements are repeated
 
       # Display message in case no-processing was needed
-      # In the tab 'General', no processing was required for:
-      # none, 2D, EDF or 3D (Smartzoom)
-      # none or 2D (Imager Vario)
-      if (all(is.null(input$acq_mode) | input$acq_mode == "2D" | (input$acq_mode %in% c("EDF", "3D") & input$instrument == "Smartzoom 5"))) h2("No pre-processing required."),
-      if (all(is.null(input$acq_mode) | input$acq_mode == "2D" | (input$acq_mode %in% c("EDF", "3D") & input$instrument == "Smartzoom 5"))) h5("If your acquisitions did require some pre-processing, specify it in the tab 'General' and come back to the tab 'Pre-processing' to enter the details."),
+      # In the tab 'General', no processing required for:
+      # none or 2D (all)
+      # EDF/3D (Smartzoom 5 and Axio Scope.A1)
+      if (all(is.null(input$acq_mode) | input$acq_mode == "2D" | (input$acq_mode %in% c("EDF", "3D") & input$instrument == "Smartzoom 5"))) h5("No pre-processing required. If your acquisitions did require some pre-processing, specify it in the tab 'General' and come back to the tab 'Pre-processing' to enter the details."),
+
+      # For Axio Scope.A1
+      # Currently no settings for EDF and Panorama
+      # Needs to be checked in Helicon Focus
+      if (any(input$acq_mode %in% c("EDF", "Panorama")) & input$instrument == "Axio Scope.A1") h5("Pre-processing settings are currently not available. Please add them manually in the exported report."),
 
       # If EDF was applied on the AxioImager
       if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT" & any(input$acq_mode == "EDF")) h2("EDF (WF)"),
@@ -625,6 +698,8 @@ server <- function(input, output) {
 
     # Not all settings are relevant for all microscopes,
     # so output data.frames must be put together differently
+
+    # For Smartzoom 5
     if (input$instrument == "Smartzoom 5") {
 
       # Add information if stitching was applied
@@ -636,10 +711,10 @@ server <- function(input, output) {
           Value = sapply(seq_along(stitch_set_val), function(i) input[[names(stitch_set_val)[i]]])
         ))
       }
+    }
 
-      # Only one 'if' call possible within 'reactive()', so 'if... else' was chosen
-      # Nested 'if... else' might be needed when more than 2 instruments are available
-    } else {
+    # For Axio Imager.Z2 Vario + LSM 800 MAT
+    if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT") {
       if (any(input$acq_mode == "EDF")) {
         temp <- rbind(temp, data.frame(
           Mode = "WF",
@@ -664,6 +739,13 @@ server <- function(input, output) {
           Setting = "Data quality (Noise Cut)",
           Value = paste0(input$topo_noise_low, "-", input$topo_noise_high, " levels")
         ))
+      }
+    }
+
+    # For Axio Scope.A1
+    if (input$instrument == "Axio Scope.A1") {
+      if (any(input$acq_mode %in% c("EDF", "Panorama"))) {
+        temp <- data.frame(Mode = NA, Category = "Add settings manually", Setting = NA, Value = NA)
       }
     }
 
