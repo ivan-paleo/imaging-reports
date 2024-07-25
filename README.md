@@ -100,9 +100,9 @@ There are two ways to get the App:
 # Operating instructions
 ## Introduction
 - In a strict sense, none of the fields are required. Yet, it is important that **you fill as many fields as possible**. Unedited fields will be filled with default values, so make sure you change them in case you did not apply default values.  
-- Some information that will be included in the report (see [tab "Report"](#tab-report)) is hard coded and does not depend on your input because it depends on the hardware only. Because of that (and other things), make sure you **use the latest version of the App**.  
+- Some information that will be included in the report (see tab [Report](#tab-report)) is hard coded and does not depend on your input because it depends on the hardware only. Because of that (and other things), make sure you **use the latest version of the App**.  
 - **Every entered information summarizes all acquisitions about which you are reporting.** Therefore, do not fill the forms for every single acquisition bur rather for all acquisitions of a project. Metadata for every acquisition should be made accessible with the acquisition files themselves (see repo [publish-micro-image](https://github.com/ivan-paleo/publish-micro-image)).
-- While it is possible to jump from any tab to any other, conditional input (i.e. input based on other input) might not update correctly. Therefore, I recommend that you **start in the side bar and then fill in every tab from left ("General") to right ("Pre-processing")**. The tab "Report" can be consulted any time to check how the output will look like.  
+- While it is possible to jump from any tab to any other, conditional input (i.e. input based on other input) might not update correctly. Therefore, I recommend that you **start in the side bar and then fill in every tab from left (tab [General](#tab-general)) to right (tab [Pre-processing](#tab-pre-processing))**. The tab [Report](#tab-report) can be consulted any time to check how the output will look like, but you might get some errors until you have filled in all tabs.  
 - **You can save the settings for one instrument at a time.**  
 - **Refer to the instrument's user manual if you need information about the settings.**
 
@@ -147,7 +147,7 @@ Tick the boxes for all acquisition modes you used.
 On the Axio Imager.Z2 Vario + LSM 800 MAT:  
 
 - Several uses can be assigned to every objective. To do so, click on every relevant use from the list. 
-- After selection, click on a use and press "DELETE" to unassign it. Make sure that at least one use is assigned to each objective (select "Not used" if you have not used a given objective).
+- After selection, click on a use and press `DELETE` to unassign it. Make sure that at least one use is assigned to each objective (select `Not used` if you have not used a given objective).
 
 ><p align="center" width="100%">
 >    <img src="screenshots/app_objectives_LSM.png"><br>
@@ -192,9 +192,9 @@ On the Axio Imager.Z2 Vario + LSM 800 MAT:
 - In case of an LSM acquisition ("3D topography"): 
 
   - Enter the information for the objective used for this type of acquisition.    
-  - Tick the box "Pinhole diameter = 1 AU" to confirm that the pinhole diameter was set properly.  
+  - Tick the box `Pinhole diameter = 1 AU` to confirm that the pinhole diameter was set properly.  
   - Enter the step size, the image size in X and Y, and the number of pixels in X and Y for the total image in case stitching was used. **It is currently not possible to enter these pieces of information for several objectives.** It is assumed that only 1 objective has been used for 3D topography.     
-  - The pixel size in X and Y is calculated and showed interactively below, as well as whether the Nyquist criterion is fulfilled for this objective. The Nyquist criterion is fulfilled when the pixel size is 2 to 3 times smaller than the lateral optical resolution (see tab [Objectives](#objectives)).  
+  - The pixel size in X and Y is calculated and showed interactively below, as well as whether the Nyquist criterion is fulfilled for this objective. The Nyquist criterion is fulfilled when the pixel size is 2 to 3 times smaller than the lateral optical resolution (see tab [Objectives](#tab-objectives)).  
   - In case the pixel size in X and Y differ, a warning will be displayed that the pixels are not square. The detector can only acquire square pixels, so at least one of the values you entered has to be wrong.
   
 ><p align="center" width="100%">
@@ -202,14 +202,14 @@ On the Axio Imager.Z2 Vario + LSM 800 MAT:
 >    <i>Warning about square pixels for the Axio Imager.Z2 Vario + LSM 800 MAT.</i>
 ></p> 
 
-On the Smartzoom 5: the only thing to choose is the z-stack mode ("Continuous" or "Stepwise") in case of an EDF/3D acquisition. 
+On the Smartzoom 5: the only thing to choose is the z-stack mode (`Continuous` or `Stepwise`) in case of an EDF/3D acquisition. 
 
 ><p align="center" width="100%">
 >    <img src="screenshots/app_acq_SZ.png"><br>
 >    <i>Acquisition tab for the Smartzoom 5.</i>
 ></p>
 
-On the Axio Scope.A1: the only thing to choose is the panorama mode ("Automatic" or "Interactive") in case of a panorama acquisition. 
+On the Axio Scope.A1: the only thing to choose is the panorama mode (`Automatic` or `Interactive`) in case of a panorama acquisition. 
 
 ><p align="center" width="100%">
 >    <img src="screenshots/app_acq_AS.png"><br>
@@ -261,7 +261,7 @@ For the Axio Scope.A1: Pre-processing settings cannot be reported yet. WIP.
 **This tab shows a preview of the entered information.**  
 I recommend that you check that everything is correct before you download the report (see below).  
 As mentioned already [here](#introduction), it can be that some fields are not updated in this tab. In such cases, go back to the beginning ([side bar](#side-bar)) and follow the tabs from left ([General](#tab-general)) to right ([Pre-processing](#tab-pre-processing)).  
-Once done, click on the `Download Report to ODS` or `Download Report to XLSX` buttons at the bottom of the tab. Save the file to your computer; I recommend to use the name provided. **Check the file.**
+Once done, click on the `Download Report to ODS` or `Download Report to XLSX` button at the bottom of the tab. Save the file to your computer; I recommend to use the name provided. **Check the file.**
 
 **Save one report for each instrument you used.**
 
