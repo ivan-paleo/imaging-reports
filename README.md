@@ -240,11 +240,11 @@ Specific to the Smartzoom 5, only settings related to stitching require input.
 >    <i>Pre-processing tab for the Smartzoom 5.</i>
 ></p>
 
-For the Axio Scope.A1: Pre-processing settings cannot be reported yet. WIP.
+For the Axio Scope.A1 and Axio Lab.A1: Pre-processing settings cannot be reported yet. WIP.
 
 ><p align="center" width="100%">
->    <img src="screenshots/app_pre-proc_AS.png"><br>
->    <i>Pre-processing tab for the Axio Scope.A1.</i>
+>    <img src="screenshots/app_pre-proc_AS-AL.png"><br>
+>    <i>Pre-processing tab for the Axio Scope.A1 and Axio Lab.A1.</i>
 ></p>
 
 

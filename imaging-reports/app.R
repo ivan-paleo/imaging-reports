@@ -38,7 +38,7 @@ ui <- fluidPage(
 
       # Selection box to select the instrument for which the report will be created
       selectInput("instrument", "Choose the instrument",
-                  c("Axio Imager.Z2 Vario + LSM 800 MAT", "Smartzoom 5", "Axio Scope.A1")),
+                  c("Axio Imager.Z2 Vario + LSM 800 MAT", "Smartzoom 5", "Axio Scope.A1", "Axio Lab.A1")),
 
       # LEIZA logo
       img(src = "Leiza_Logo_Deskriptor_CMYK_rot_LEIZA.png", height = 150),
@@ -116,8 +116,8 @@ server <- function(input, output) {
       assign("setup", c("Location", "Setup", "Steel table on solid concrete base"), envir = .GlobalEnv)
     }
 
-    # Axio Scope.A1
-    if (input$instrument == "Axio Scope.A1") {
+    # Axio Scope.A1 and Axio Lab.A1
+    if (input$instrument %in% c("Axio Scope.A1", "Axio Lab.A1")) {
       soft <- c("ZEN core", "Helicon Focus")
       acq_modes <- c("2D", "EDF", "Panorama")
     }
@@ -220,19 +220,32 @@ server <- function(input, output) {
   # 3.2.1. Render tab 'obj'
   output$obj <- renderUI({
 
-    # Define objectives and settings for Axio Scope.A1
-    if (input$instrument == "Axio Scope.A1") {
-      obj_na <- c(0.13, 0.25, 0.40, 0.75)
+    # Define objectives and settings for Axio Scope.A1 and Axio Lab.A1
+    if (input$instrument %in% c("Axio Scope.A1", "Axio Lab.A1")) {
       obj_mag <- c("5x", "10x", "20x", "50x")
-      assign("obj_Kna", 0.61/obj_na, envir = .GlobalEnv)
-      assign("objectives",
-             paste0("EC Epiplan ", obj_mag, " / NA = ", obj_na, " / WD = ", c(11.8, 11, 3.2, 1), " mm"),
-             envir = .GlobalEnv)
       obj_use <- c("Color image", "Not used")
       sel_multi <- FALSE
       sel_value <- "Not used"
       lambda <- 550
       names(lambda) <- "White LED (550 nm) - WF"
+    }
+
+    # Define objectives and settings for Axio Scope.A1
+    if (input$instrument == "Axio Scope.A1") {
+      obj_na <- c(0.13, 0.25, 0.40, 0.75)
+      assign("obj_Kna", 0.61/obj_na, envir = .GlobalEnv)
+      assign("objectives",
+             paste0("EC Epiplan ", obj_mag, " / NA = ", obj_na, " / WD = ", c(11.8, 11, 3.2, 1), " mm"),
+             envir = .GlobalEnv)
+    }
+
+    # Define objectives and settings for Axio Lab.A1
+    if (input$instrument == "Axio Lab.A1") {
+      obj_na <- c(0.15, 0.25, 0.45, 0.80)
+      assign("obj_Kna", 0.61/obj_na, envir = .GlobalEnv)
+      assign("objectives",
+             paste0("N-Achroplan Pol ", obj_mag, " / NA = ", obj_na, " / WD = ", c(12, 6.5, 0.63, 0.41), " mm"),
+             envir = .GlobalEnv)
     }
 
     # Define objectives and settings for Smartzoom 5
@@ -400,7 +413,7 @@ server <- function(input, output) {
                                   Setting = c("Type", "Adapter", "Camera sensor size"),
                                   Value = c("CMOS", "1x", "1''")
                                   ), envir = .GlobalEnv
-      )
+            )
     }
 
     # Define settings for Axio Imager.Z2 Vario + LSM 800 MAT and Axio Scope.A1
@@ -410,21 +423,36 @@ server <- function(input, output) {
                                   Setting = c("Type", "Manufacturer", "Model", "Adapter", "Camera sensor size",
                                               "Camera pixel size"),
                                   Value = c("CMOS", "Zeiss", "Axiocam 305 color", "1x", "8.5 x 7.1 mm", "3.45 x 3.45 µm")
-      ),
-      envir = .GlobalEnv
-      )
+                                  ), envir = .GlobalEnv
+            )
+    }
+
+    # Define settings for Axio Lab.A1
+    if (input$instrument == "Axio Lab.A1") {
+      assign("Camera", data.frame(Mode = "WF",
+                                  Category = "Camera",
+                                  Setting = c("Type", "Manufacturer", "Model", "Adapter", "Camera sensor size",
+                                              "Camera pixel size"),
+                                  Value = c("CMOS", "Zeiss", "Axiocam 305 color", "0.63x", "8.5 x 7.1 mm", "3.45 x 3.45 µm")
+                                  ), envir = .GlobalEnv
+            )
     }
 
     # Create a list of inputs
     tagList(
 
-      # Axio Scope.A1
-      if (all((is.null(input$acq_mode) | input$acq_mode %in% c("EDF", "2D"))) & input$instrument == "Axio Scope.A1") {
-        h5("No input required.")
+      # Axio Scope.A1 and Axio Lab.A1
+      if (input$instrument == "Axio Scope.A1") h2("Reflector"),
+      if (input$instrument == "Axio Scope.A1") {
+        checkboxGroupInput("reflector", label = "", choices = c("Epi BF", "Epi C-DIC"), selected = "Epi BF")
       },
-      if (any(input$acq_mode == "Panorama") & input$instrument == "Axio Scope.A1") h2("Panorama"),
-      if (any(input$acq_mode == "Panorama") & input$instrument == "Axio Scope.A1") {
-        selectInput("panorama", label = "Panorama mode", choices = c("Automatic", "Interactive"), selected = "Automatic")
+      if (input$instrument == "Axio Lab.A1") h2("Polarization & conoscopy"),
+      if (input$instrument == "Axio Lab.A1") {
+        checkboxGroupInput("pol", label = "", choices = c("Polarizer", "Analyzer", "Bertrand lens"))
+      },
+      if (any(input$acq_mode == "Panorama") & input$instrument %in% c("Axio Scope.A1", "Axio Lab.A1")) h2("Panorama"),
+      if (any(input$acq_mode == "Panorama") & input$instrument %in% c("Axio Scope.A1", "Axio Lab.A1")) {
+        selectInput("panorama", label = "", choices = c("Automatic", "Interactive"), selected = "Automatic")
       },
 
       # Axio Imager.Z2 Vario + LSM 800 MAT
@@ -518,8 +546,36 @@ server <- function(input, output) {
                          Value = c("Reflected light", "LED", "550 nm (average)", "Unknown"))
     }
 
+    # For Axio Lab.A1
+    if (input$instrument == "Axio Lab.A1") {
+      temp <- data.frame(Mode = "WF",
+                         Category = "Illumination",
+                         Setting = c("Type", "Source", "Wavelength", "Power"),
+                         Value = c("Transmitted light", "LED", "550 nm (average)", "Unknown"))
+    }
+
     # rbind with WF camera info
     temp <- rbind(temp, Camera)
+
+    # rbind with reflector info for Axio Scope.A1
+    if (input$instrument == "Axio Scope.A1") {
+      temp <- rbind(temp, data.frame(Mode = "WF",
+                                     Category = "Imaging",
+                                     Setting = "Reflector",
+                                     Value = paste(input$reflector, collapse = ", ")
+                                     )
+                   )
+    }
+
+    # rbind with polarization info for Axio Lab.A1
+    if (input$instrument == "Axio Lab.A1") {
+      temp <- rbind(temp, data.frame(Mode = "WF",
+                                     Category = "Imaging",
+                                     Setting = "Polarization",
+                                     Value = ifelse(is.null(input$pol), "None", paste(input$pol, collapse = ", "))
+                                     )
+                   )
+    }
 
     # rbind with WF imaging (Z-stack) info, if applicable
     # For the Smartzoom 5
@@ -550,9 +606,9 @@ server <- function(input, output) {
                    )
     }
 
-    # For Axio Scope.A1
+    # For Axio Scope.A1 and Axio Lab.A1
     # rbind with panorama mode
-    if (any(input$acq_mode == "Panorama") & input$instrument == "Axio Scope.A1") {
+    if (any(input$acq_mode == "Panorama") & input$instrument %in% c("Axio Scope.A1", "Axio Lab.A1")) {
       temp <- rbind(temp, data.frame(Mode = "WF",
                                      Category = "Imaging",
                                      Setting = "Panorama mode",
@@ -650,7 +706,9 @@ server <- function(input, output) {
       # For Axio Scope.A1
       # Currently no settings for EDF and Panorama
       # Needs to be checked in Helicon Focus
-      if (any(input$acq_mode %in% c("EDF", "Panorama")) & input$instrument == "Axio Scope.A1") h5("Pre-processing settings are currently not available. Please add them manually in the exported report."),
+      if (any(input$acq_mode %in% c("EDF", "Panorama")) & input$instrument %in% c("Axio Scope.A1", "Axio Lab.A1")) {
+        h5("Pre-processing settings are currently not available. Please add them manually in the exported report.")
+      },
 
       # If EDF was applied on the AxioImager
       if (input$instrument == "Axio Imager.Z2 Vario + LSM 800 MAT" & any(input$acq_mode == "EDF")) h2("EDF (WF)"),
@@ -742,8 +800,8 @@ server <- function(input, output) {
       }
     }
 
-    # For Axio Scope.A1
-    if (input$instrument == "Axio Scope.A1") {
+    # For Axio Scope.A1 and Axio Lab.A1
+    if (input$instrument %in% c("Axio Scope.A1", "Axio Lab.A1")) {
       if (any(input$acq_mode %in% c("EDF", "Panorama"))) {
         temp <- data.frame(Mode = NA, Category = "Add settings manually", Setting = NA, Value = NA)
       }
@@ -809,7 +867,7 @@ server <- function(input, output) {
     content = function(file){
 
       # Write to ODS, each table in a sheet
-      readODS::write_ods(list(General_settings = report_general(), Objectives = report_obj(),
+      readODS::write_ods(list(General_settings = report_general(), Objectives = report_obj(), Acquisition = report_acq(),
                               Pre_processing = report_proc(), Abbreviations = report_abbr()), file)
     }
   )
@@ -822,7 +880,7 @@ server <- function(input, output) {
              format(Sys.time(), "_%Y-%m-%d_%H-%M-%S"), ".xlsx")
     },
     content = function(file){
-      writexl::write_xlsx(list(General_settings = report_general(), Objectives = report_obj(),
+      writexl::write_xlsx(list(General_settings = report_general(), Objectives = report_obj(), Acquisition = report_acq(),
                                Pre_processing = report_proc(), Abbreviations = report_abbr()), file)
     }
   )
