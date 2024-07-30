@@ -17,26 +17,26 @@
     - [Side bar](#side-bar)
     - [Tab "General"](#tab-general)
     - [Tab "Objectives"](#tab-objectives)
-        - [Axio Imager.Z2 Vario + LSM 800 MAT](#axio-imagerz2-vario--lsm-800-mat)
-        - [Smartzoom 5](#smartzoom-5)
-        - [Axio Scope.A1](#axio-scopea1)
-        - [Axio Lab.A1](#axio-laba1)
+        - [Objectives for Axio Imager.Z2 Vario + LSM 800 MAT](#objectives-for-axio-imagerz2-vario--lsm-800-mat)
+        - [Objectives for Smartzoom 5](#objectives-for-smartzoom-5)
+        - [Objectives for Axio Scope.A1](#objectives-for-axio-scopea1)
+        - [Objectives for Axio Lab.A1](#objectives-for-axio-laba1)
         - [Lateral optical resolution](#lateral-optical-resolution)
     - [Tab "Acquisition"](#tab-acquisition)
-        - [Axio Imager.Z2 Vario + LSM 800 MAT](#axio-imagerz2-vario--lsm-800-mat)
-        - [Smartzoom 5](#smartzoom-5)
-        - [Axio Scope.A1](#axio-scopea1)
-        - [Axio Lab.A1](#axio-laba1)
+        - [Acquisition for Axio Imager.Z2 Vario + LSM 800 MAT](#acquisition-for-axio-imagerz2-vario--lsm-800-mat)
+        - [Acquisition for Smartzoom 5](#acquisition-for-smartzoom-5)
+        - [Acquisition for Axio Scope.A1](#acquisition-for-axio-scopea1)
+        - [Acquisition for Axio Lab.A1](#acquisition-for-axio-laba1)
     - [Tab "Pre-processing"](#tab-pre-processing)
-        - [Axio Imager.Z2 Vario + LSM 800 MAT](#axio-imagerz2-vario--lsm-800-mat)
-        - [Smartzoom 5](#smartzoom-5)
-        - [Axio Scope.A1 and Axio Lab.A1](#axio-scopea1-and-axio-laba1)
+        - [Pre-processing for Axio Imager.Z2 Vario + LSM 800 MAT](#pre-processing-for-axio-imagerz2-vario--lsm-800-mat)
+        - [Pre-processing for Smartzoom 5](#pre-processing-for-smartzoom-5)
+        - [Pre-processing for Axio Scope.A1 and Axio Lab.A1](#pre-processing-for-axio-scopea1-and-axio-laba1)
     - [Tab "Abbreviations"](#tab-abbreviations)
     - [Tab "Report"](#tab-report)
-        - [Axio Imager.Z2 Vario + LSM 800 MAT](#axio-imagerz2-vario--lsm-800-mat)
-        - [Smartzoom 5](#smartzoom-5)
-        - [Axio Scope.A1](#axio-scopea1)
-        - [Axio Lab.A1](#axio-laba1)
+        - [Report for Axio Imager.Z2 Vario + LSM 800 MAT](#report-for-axio-imagerz2-vario--lsm-800-mat)
+        - [Report for Smartzoom 5](#report-for-smartzoom-5)
+        - [Report for Axio Scope.A1](#report-for-axio-scopea1)
+        - [Report for Axio Lab.A1](#report-for-axio-laba1)
 - [How to adapt the App](#how-to-adapt-the-app)
 - [How to contribute](#how-to-contribute)
 - [License](#license)
@@ -160,7 +160,7 @@ Tick the boxes for all acquisition modes you used.
 ## Tab "Objectives"
 **Select from the list how each objective has been used.**  
 
-### Axio Imager.Z2 Vario + LSM 800 MAT 
+### Objectives for Axio Imager.Z2 Vario + LSM 800 MAT 
 
 - Several uses can be assigned to every objective. To do so, click on every relevant use from the list.  
 - `Color image` here is meant in the widest sense to refer to any WF image acquired with the camera, even in black & white mode, with any color filter or with any contrast method (bright field, polarization, dark field, C-DIC). `3D topography` refers to an LSM acquisition. Other choices are `Preview scan` and `Coordinate system`.  
@@ -171,25 +171,25 @@ Tick the boxes for all acquisition modes you used.
 >    <i>Objectives tab for the Axio Imager.Z2 Vario + LSM 800 MAT.</i>
 ></p>
 
-### Smartzoom 5
+### Objectives for Smartzoom 5
 By default, none of the objectives has been used, so make sure you assign a use to at least one objective.  
-See [Axio Imager.Z2 Vario + LSM 800 MAT](#axio-imagerz2-vario--lsm-800-mat) for details on choices of uses.
+See [Objectives for Axio Imager.Z2 Vario + LSM 800 MAT](#objectives-for-axio-imagerz2-vario--lsm-800-mat) for details on choices of uses.
 
 ><p align="center" width="100%">
 >    <img src="screenshots/app_objectives_SZ.png"><br>
 >    <i>Objectives tab for the Smartzoom 5.</i>
 ></p>
 
-### Axio Scope.A1
-See [Smartzoom 5](#smartzoom-5).
+### Objectives for Axio Scope.A1
+See [Objectives for Smartzoom 5](#objectives-for-smartzoom-5).
 
 ><p align="center" width="100%">
 >    <img src="screenshots/app_objectives_AS.png"><br>
 >    <i>Objectives tab for the Axio Scope.A1.</i>
 ></p>
 
-### Axio Lab.A1
-See [Smartzoom 5](#smartzoom-5).
+### Objectives for Axio Lab.A1
+See [Objectives for Smartzoom 5](#objectives-for-smartzoom-5).
 
 ><p align="center" width="100%">
 >    <img src="screenshots/app_objectives_AL.png"><br>
@@ -209,7 +209,7 @@ The graph can be exported to PDF (vector) or PNG (raster) using the buttons belo
 ## Tab "Acquisition"
 In case of acquisitions for which no settings can be defined (e.g. simple 2D), the message "No input required" will be displayed in the tab. If you did define some settings, either you did acquire using a different mode and you therefore need to tick the corresponding boxes in the tab [General](#tab-general), or some settings are actually related to pre-processing (especially in case of the Smartzoom 5, see tab [Pre-processing](#tab-pre-processing)).
 
-### Axio Imager.Z2 Vario + LSM 800 MAT  
+### Acquisition for Axio Imager.Z2 Vario + LSM 800 MAT  
 
 - Choose the type of illumination: reflected or transmitted.  
 
@@ -223,7 +223,7 @@ In case of acquisitions for which no settings can be defined (e.g. simple 2D), t
   - Enter the information for the objective used for this type of acquisition.    
   - Tick the box `Pinhole diameter = 1 AU` to confirm that the pinhole diameter was set properly.  
   - Enter the step size, the image size in X and Y, and the number of pixels in X and Y for the total image in case stitching was used. **It is currently not possible to enter these pieces of information for several objectives.** It is assumed that only 1 objective has been used for 3D topography.     
-  - The pixel size in X and Y is calculated and showed interactively below, as well as whether the Nyquist criterion is fulfilled for this objective. The Nyquist criterion is fulfilled when the pixel size is 2 to 3 times smaller than the lateral optical resolution (see tab [Objectives](#tab-objectives)).  
+  - The pixel size in X and Y is calculated and showed interactively below, as well as whether the Nyquist criterion is fulfilled for this objective. The Nyquist criterion is fulfilled when the pixel size is 2 to 3 times smaller than the lateral optical resolution (see tab [Objectives](#objectives-for-axio-imagerz2-vario--lsm-800-mat)).  
   - In case the pixel size in X and Y differ, a warning will be displayed that the pixels are not square. The detector can only acquire square pixels, so at least one of the values you entered has to be wrong.
   
 ><p align="center" width="100%">
@@ -231,7 +231,7 @@ In case of acquisitions for which no settings can be defined (e.g. simple 2D), t
 >    <i>Warning about square pixels for the Axio Imager.Z2 Vario + LSM 800 MAT.</i>
 ></p> 
 
-### Smartzoom 5
+### Acquisition for Smartzoom 5
 The only thing to choose is the z-stack mode (`Continuous` or `Stepwise`) in case of an EDF/3D acquisition. 
 
 ><p align="center" width="100%">
@@ -239,7 +239,7 @@ The only thing to choose is the z-stack mode (`Continuous` or `Stepwise`) in cas
 >    <i>Acquisition tab for the Smartzoom 5.</i>
 ></p>
 
-### Axio Scope.A1
+### Acquisition for Axio Scope.A1
 Choose the reflector (`Epi BF` or `Epi C-DIC`).  
 In case of a panorama acquisition, choose the panorama mode (`Automatic` or `Interactive`). 
 
@@ -248,7 +248,7 @@ In case of a panorama acquisition, choose the panorama mode (`Automatic` or `Int
 >    <i>Acquisition tab for the Axio Scope.A1.</i>
 ></p>
 
-### Axio Lab.A1
+### Acquisition for Axio Lab.A1
 Tick the boxes for the polarization lenses (`Polarizer`, `Analyzer` or `Bertrand lens`) that you used, if any.  
 In case of a panorama acquisition, choose the panorama mode (`Automatic` or `Interactive`). 
 
@@ -269,7 +269,7 @@ Some acquisition modes do not require pre-processing (e.g. 2D on all instruments
 
 Different fields to fill in appear depending on instrument used and on the acquisition modes applied.
 
-### Axio Imager.Z2 Vario + LSM 800 MAT
+### Pre-processing for Axio Imager.Z2 Vario + LSM 800 MAT
 There are many settings related to EDF, stitching and 3D topography. In most cases, default values can be used.
 
 ><p align="center" width="100%">
@@ -277,7 +277,7 @@ There are many settings related to EDF, stitching and 3D topography. In most cas
 >    <i>Pre-processing tab for the Axio Imager.Z2 Vario + LSM 800 MAT.</i>
 ></p>
 
-### Smartzoom 5
+### Pre-processing for Smartzoom 5
 Only settings related to stitching require input.
 
 ><p align="center" width="100%">
@@ -285,7 +285,7 @@ Only settings related to stitching require input.
 >    <i>Pre-processing tab for the Smartzoom 5.</i>
 ></p>
 
-### Axio Scope.A1 and Axio Lab.A1
+### Pre-processing for Axio Scope.A1 and Axio Lab.A1
 Pre-processing settings cannot be reported yet. WIP.
 
 ><p align="center" width="100%">
@@ -311,28 +311,28 @@ Once done, click on the `Download Report to ODS` or `Download Report to XLSX` bu
 
 **Save one report for each instrument you used.**
 
-### Axio Imager.Z2 Vario + LSM 800 MAT
+### Report for Axio Imager.Z2 Vario + LSM 800 MAT
 
 ><p align="center" width="100%">
 >    <img src="screenshots/app_report_LSM.png"><br>
 >    <i>Example report with the Axio Imager.Z2 Vario + LSM 800 MAT.</i>
 ></p>
 
-### Smartzoom 5
+### Report for Smartzoom 5
 
 ><p align="center" width="100%">
 >    <img src="screenshots/app_report_SZ.png"><br>
 >    <i>Example report with the Smartzoom 5.</i>
 ></p>
 
-### Axio Scope.A1
+### Report for Axio Scope.A1
 
 ><p align="center" width="100%">
 >    <img src="screenshots/app_report_AS.png"><br>
 >    <i>Example report with the Axio Scope.A1.</i>
 ></p>
 
-### Axio Lab.A1
+### Report for Axio Lab.A1
 
 ><p align="center" width="100%">
 >    <img src="screenshots/app_report_AL.png"><br>
