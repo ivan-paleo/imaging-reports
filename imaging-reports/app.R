@@ -195,7 +195,8 @@ server <- function(input, output) {
     }
 
     # convert Category to factor in order to sort the rows
-    temp$Category <- factor(temp$Category, levels = c("User", "Microscope", "Software", "Location", "Acquisition"))
+    temp$Category <- factor(temp$Category, levels = c("User", "Microscope", "Software", "Location",
+                                                      "Acquisition", "Maintenance"))
     temp <- arrange(temp, Category, Setting)
 
     # return temp
