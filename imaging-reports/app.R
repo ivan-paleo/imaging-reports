@@ -888,8 +888,9 @@ server <- function(input, output) {
   # 3.6.3. Graph PDF
   output$downloadGraphPDF <- downloadHandler(
     filename = function() {
-      paste0("IMPALA-graph_", gsub(" ", "-", input$name), "_lambda", input$lambda, "nm",
-             format(Sys.time(), "_%Y-%m-%d_%H-%M-%S"), ".pdf")
+      paste0("IMPALA-graph_", gsub(" ", "-", input$name), "_",
+             gsub(" ", "", gsub("\\+", "-", input$instrument)),
+             "_lambda", input$lambda, "nm", format(Sys.time(), "_%Y-%m-%d_%H-%M-%S"), ".pdf")
     },
     content = function(file){
       ggsave(file, device = "pdf", width = 190, units = "mm")
@@ -899,8 +900,9 @@ server <- function(input, output) {
   # 3.6.4. Graph PNG
   output$downloadGraphPNG <- downloadHandler(
     filename = function() {
-      paste0("IMPALA-graph_", gsub(" ", "-", input$name), "_lambda", input$lambda, "nm",
-             format(Sys.time(), "_%Y-%m-%d_%H-%M-%S"), ".png")
+      paste0("IMPALA-graph_", gsub(" ", "-", input$name), "_",
+             gsub(" ", "", gsub("\\+", "-", input$instrument)),
+             "_lambda", input$lambda, "nm", format(Sys.time(), "_%Y-%m-%d_%H-%M-%S"), ".png")
     },
     content = function(file){
       ggsave(file, device = "png", width = 190, units = "mm")

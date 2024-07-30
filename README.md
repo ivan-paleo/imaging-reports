@@ -17,10 +17,26 @@
     - [Side bar](#side-bar)
     - [Tab "General"](#tab-general)
     - [Tab "Objectives"](#tab-objectives)
+        - [Axio Imager.Z2 Vario + LSM 800 MAT](#axio-imagerz2-vario--lsm-800-mat)
+        - [Smartzoom 5](#smartzoom-5)
+        - [Axio Scope.A1](#axio-scopea1)
+        - [Axio Lab.A1](#axio-laba1)
+        - [Lateral optical resolution](#lateral-optical-resolution)
     - [Tab "Acquisition"](#tab-acquisition)
+        - [Axio Imager.Z2 Vario + LSM 800 MAT](#axio-imagerz2-vario--lsm-800-mat)
+        - [Smartzoom 5](#smartzoom-5)
+        - [Axio Scope.A1](#axio-scopea1)
+        - [Axio Lab.A1](#axio-laba1)
     - [Tab "Pre-processing"](#tab-pre-processing)
+        - [Axio Imager.Z2 Vario + LSM 800 MAT](#axio-imagerz2-vario--lsm-800-mat)
+        - [Smartzoom 5](#smartzoom-5)
+        - [Axio Scope.A1 and Axio Lab.A1](#axio-scopea1-and-axio-laba1)
     - [Tab "Abbreviations"](#tab-abbreviations)
     - [Tab "Report"](#tab-report)
+        - [Axio Imager.Z2 Vario + LSM 800 MAT](#axio-imagerz2-vario--lsm-800-mat)
+        - [Smartzoom 5](#smartzoom-5)
+        - [Axio Scope.A1](#axio-scopea1)
+        - [Axio Lab.A1](#axio-laba1)
 - [How to adapt the App](#how-to-adapt-the-app)
 - [How to contribute](#how-to-contribute)
 - [License](#license)
@@ -47,7 +63,7 @@ Once all fields are entered, **the report can be exported to an ODS or XLSX file
 **This report can and should be published together with the image data.** While publishing them as a supplementary material to a paper is OK, I recommend publishing everything in open access on an online repository like [Zenodo](https://zenodo.org/), [Figshare](https://figshare.com/) or [OSF](https://osf.io/) for easy and long-term accessibility. Additionally or alternatively, the report could be attached to a protocol, for example on [protocols.io](https://www.protocols.io/).  
 For more details, **check my repo** [**publish-micro-image**](https://github.com/ivan-paleo/publish-micro-image).
 
-The App is designed for the instruments available at the [IMPALA](https://www.leiza.de/forschung/infrastrukturen/labore/impala) and currently includes the digital microscope (Zeiss Smartzoom 5), the upright light microscope + LSCM (Zeiss Axio Imager.Z2 Vario + LSM 800 MAT, abbreviated "LSM") and the reflected light microscope (Zeiss Axio Scope.A1). More instruments will be added later.
+The App is designed for the instruments available at the [IMPALA](https://www.leiza.de/forschung/infrastrukturen/labore/impala) and currently includes the digital microscope (Zeiss Smartzoom 5), the upright light microscope + LSCM (Zeiss Axio Imager.Z2 Vario + LSM 800 MAT, abbreviated "LSM"), the reflected light microscope (Zeiss Axio Scope.A1) and the transmitted light microscope (Zeiss Axio Lab.A1). More instruments will be added later.
 
 If you would like to adapt the App to your instrument(s), check the sections [How to adapt the App](#how-to-adapt-the-app), [How to contribute](#how-to-contribute) and [License](#license).
 
@@ -100,16 +116,16 @@ There are two ways to get the App:
 # Operating instructions
 ## Introduction
 - In a strict sense, none of the fields are required. Yet, it is important that **you fill as many fields as possible**. Unedited fields will be filled with default values, so make sure you change them in case you did not apply default values.  
-- Some information that will be included in the report (see tab [Report](#tab-report)) is hard coded and does not depend on your input because it depends on the hardware only. Because of that (and other things), make sure you **use the latest version of the App**.  
+- Some information that will be included in the report (see tab [Report](#tab-report)) is hard coded and does not depend on your input because it depends on the hardware only. Because of that (and also developments and bug fixes), make sure you **use the latest version of the App**.  
 - **Every entered information summarizes all acquisitions about which you are reporting.** Therefore, do not fill the forms for every single acquisition bur rather for all acquisitions of a project. Metadata for every acquisition should be made accessible with the acquisition files themselves (see repo [publish-micro-image](https://github.com/ivan-paleo/publish-micro-image)).
-- While it is possible to jump from any tab to any other, conditional input (i.e. input based on other input) might not update correctly. Therefore, I recommend that you **start in the side bar and then fill in every tab from left (tab [General](#tab-general)) to right (tab [Pre-processing](#tab-pre-processing))**. The tab [Report](#tab-report) can be consulted any time to check how the output will look like, but you might get some errors until you have filled in all tabs.  
+- While it is possible to jump from any tab to any other, conditional input (i.e. input based on other input) might not update correctly. Therefore, I recommend that you **start in the [side bar](#side-bar) and then fill in every tab from left (tab [General](#tab-general)) to right (tab [Pre-processing](#tab-pre-processing))**. The tab [Report](#tab-report) can be consulted any time to check how the output will look like, but you might get some errors until you have filled in all tabs.  
 - **You can save the settings for one instrument at a time.**  
 - **Refer to the instrument's user manual if you need information about the settings.**
 
 
 ## Side bar
 **Enter your name and select the instrument you used from the list.**  
-Start again at the tab "General" if you switch to another instrument.
+Start again at the tab [General](#tab-general) if you switch to another instrument.
 
 Click on the GitHub button to access the repository with the source code.
 
@@ -136,17 +152,18 @@ Tick the boxes for all acquisition modes you used.
 ></p>
 
 ><p align="center" width="100%">
->    <img src="screenshots/app_general_AS_filled.png"><br>
->    <i>General tab for the Axio Scope.A1.</i>
+>    <img src="screenshots/app_general_AS-AL_filled.png"><br>
+>    <i>General tab for the Axio Scope.A1 and Axio Lab.A1.</i>
 ></p>
 
 
 ## Tab "Objectives"
 **Select from the list how each objective has been used.**  
 
-On the Axio Imager.Z2 Vario + LSM 800 MAT:  
+### Axio Imager.Z2 Vario + LSM 800 MAT 
 
-- Several uses can be assigned to every objective. To do so, click on every relevant use from the list. 
+- Several uses can be assigned to every objective. To do so, click on every relevant use from the list.  
+- `Color image` here is meant in the widest sense to refer to any WF image acquired with the camera, even in black & white mode, with any color filter or with any contrast method (bright field, polarization, dark field, C-DIC). `3D topography` refers to an LSM acquisition. Other choices are `Preview scan` and `Coordinate system`.  
 - After selection, click on a use and press `DELETE` to unassign it. Make sure that at least one use is assigned to each objective (select `Not used` if you have not used a given objective).
 
 ><p align="center" width="100%">
@@ -154,22 +171,34 @@ On the Axio Imager.Z2 Vario + LSM 800 MAT:
 >    <i>Objectives tab for the Axio Imager.Z2 Vario + LSM 800 MAT.</i>
 ></p>
 
-On the Smartzoom 5: by default, none of the objectives has been used, so make sure you assign a use to at least one objective.
+### Smartzoom 5
+By default, none of the objectives has been used, so make sure you assign a use to at least one objective.  
+See [Axio Imager.Z2 Vario + LSM 800 MAT](#axio-imagerz2-vario--lsm-800-mat) for details on choices of uses.
 
 ><p align="center" width="100%">
 >    <img src="screenshots/app_objectives_SZ.png"><br>
 >    <i>Objectives tab for the Smartzoom 5.</i>
 ></p>
 
-It works the same way on the Axio Scope.A1.
+### Axio Scope.A1
+See [Smartzoom 5](#smartzoom-5).
 
 ><p align="center" width="100%">
 >    <img src="screenshots/app_objectives_AS.png"><br>
 >    <i>Objectives tab for the Axio Scope.A1.</i>
 ></p>
 
-Below the fields to assign uses to objectives, a barplot shows the lateral optical resolutions of each used objective. For the Axio Imager.Z2 Vario + LSM 800 MAT, you have the choice for the wavelength of the light source (`Violet laser (405 nm) - LSM` for the LSM 800 MAT or `White LED (550 nm) - WF` for the Axio Imager.Z2 Vario) but only the latter is available for the Smartzoom 5.  
-The graph can be exported to PDF or PNG using the buttons below.
+### Axio Lab.A1
+See [Smartzoom 5](#smartzoom-5).
+
+><p align="center" width="100%">
+>    <img src="screenshots/app_objectives_AL.png"><br>
+>    <i>Objectives tab for the Axio Lab.A1.</i>
+></p>
+
+### Lateral optical resolution
+Below the fields to assign uses to objectives, a barplot shows the lateral optical resolutions of each used objective. For the Axio Imager.Z2 Vario + LSM 800 MAT, you have the choice for the wavelength of the light source (`Violet laser (405 nm) - LSM` for the LSM 800 MAT or `White LED (550 nm) - WF` for the Axio Imager.Z2 Vario) but only the latter is available on the other instruments.  
+The graph can be exported to PDF (vector) or PNG (raster) using the buttons below.
 
 ><p align="center" width="100%">
 >    <img src="screenshots/app_objectives_resolution.png"><br>
@@ -180,7 +209,7 @@ The graph can be exported to PDF or PNG using the buttons below.
 ## Tab "Acquisition"
 In case of acquisitions for which no settings can be defined (e.g. simple 2D), the message "No input required" will be displayed in the tab. If you did define some settings, either you did acquire using a different mode and you therefore need to tick the corresponding boxes in the tab [General](#tab-general), or some settings are actually related to pre-processing (especially in case of the Smartzoom 5, see tab [Pre-processing](#tab-pre-processing)).
 
-On the Axio Imager.Z2 Vario + LSM 800 MAT:  
+### Axio Imager.Z2 Vario + LSM 800 MAT  
 
 - Choose the type of illumination: reflected or transmitted.  
 
@@ -189,7 +218,7 @@ On the Axio Imager.Z2 Vario + LSM 800 MAT:
 >    <i>Acquisition tab for the Axio Imager.Z2 Vario + LSM 800 MAT.</i>
 ></p>
 
-- In case of an LSM acquisition ("3D topography"): 
+- In case of an LSM acquisition (`3D topography`): 
 
   - Enter the information for the objective used for this type of acquisition.    
   - Tick the box `Pinhole diameter = 1 AU` to confirm that the pinhole diameter was set properly.  
@@ -202,18 +231,30 @@ On the Axio Imager.Z2 Vario + LSM 800 MAT:
 >    <i>Warning about square pixels for the Axio Imager.Z2 Vario + LSM 800 MAT.</i>
 ></p> 
 
-On the Smartzoom 5: the only thing to choose is the z-stack mode (`Continuous` or `Stepwise`) in case of an EDF/3D acquisition. 
+### Smartzoom 5
+The only thing to choose is the z-stack mode (`Continuous` or `Stepwise`) in case of an EDF/3D acquisition. 
 
 ><p align="center" width="100%">
 >    <img src="screenshots/app_acq_SZ.png"><br>
 >    <i>Acquisition tab for the Smartzoom 5.</i>
 ></p>
 
-On the Axio Scope.A1: the only thing to choose is the panorama mode (`Automatic` or `Interactive`) in case of a panorama acquisition. 
+### Axio Scope.A1
+Choose the reflector (`Epi BF` or `Epi C-DIC`).  
+In case of a panorama acquisition, choose the panorama mode (`Automatic` or `Interactive`). 
 
 ><p align="center" width="100%">
 >    <img src="screenshots/app_acq_AS.png"><br>
 >    <i>Acquisition tab for the Axio Scope.A1.</i>
+></p>
+
+### Axio Lab.A1
+Tick the boxes for the polarization lenses (`Polarizer`, `Analyzer` or `Bertrand lens`) that you used, if any.  
+In case of a panorama acquisition, choose the panorama mode (`Automatic` or `Interactive`). 
+
+><p align="center" width="100%">
+>    <img src="screenshots/app_acq_AL.png"><br>
+>    <i>Acquisition tab for the Axio Lab.A1.</i>
 ></p>
 
 
@@ -228,19 +269,24 @@ Some acquisition modes do not require pre-processing (e.g. 2D on all instruments
 
 Different fields to fill in appear depending on instrument used and on the acquisition modes applied.
 
+### Axio Imager.Z2 Vario + LSM 800 MAT
+There are many settings related to EDF, stitching and 3D topography. In most cases, default values can be used.
+
 ><p align="center" width="100%">
 >    <img src="screenshots/app_pre-proc_LSM.png"><br>
 >    <i>Pre-processing tab for the Axio Imager.Z2 Vario + LSM 800 MAT.</i>
 ></p>
 
-Specific to the Smartzoom 5, only settings related to stitching require input.
+### Smartzoom 5
+Only settings related to stitching require input.
 
 ><p align="center" width="100%">
 >    <img src="screenshots/app_pre-proc_SZ.png"><br>
 >    <i>Pre-processing tab for the Smartzoom 5.</i>
 ></p>
 
-For the Axio Scope.A1 and Axio Lab.A1: Pre-processing settings cannot be reported yet. WIP.
+### Axio Scope.A1 and Axio Lab.A1
+Pre-processing settings cannot be reported yet. WIP.
 
 ><p align="center" width="100%">
 >    <img src="screenshots/app_pre-proc_AS-AL.png"><br>
@@ -265,19 +311,32 @@ Once done, click on the `Download Report to ODS` or `Download Report to XLSX` bu
 
 **Save one report for each instrument you used.**
 
+### Axio Imager.Z2 Vario + LSM 800 MAT
+
 ><p align="center" width="100%">
 >    <img src="screenshots/app_report_LSM.png"><br>
 >    <i>Example report with the Axio Imager.Z2 Vario + LSM 800 MAT.</i>
 ></p>
+
+### Smartzoom 5
 
 ><p align="center" width="100%">
 >    <img src="screenshots/app_report_SZ.png"><br>
 >    <i>Example report with the Smartzoom 5.</i>
 ></p>
 
+### Axio Scope.A1
+
 ><p align="center" width="100%">
 >    <img src="screenshots/app_report_AS.png"><br>
 >    <i>Example report with the Axio Scope.A1.</i>
+></p>
+
+### Axio Lab.A1
+
+><p align="center" width="100%">
+>    <img src="screenshots/app_report_AL.png"><br>
+>    <i>Example report with the Axio Lab.A1.</i>
 ></p>
 
 
