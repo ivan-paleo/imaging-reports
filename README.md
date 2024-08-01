@@ -12,6 +12,7 @@
     - [Pre-requisites](#pre-requisites)
     - [Download the repository](#download-the-repository)
     - [Start the App](#start-the-app)
+    - [Save input](#save-input)
 - [Operating instructions](#operating-instructions)
     - [Introduction](#introduction)
     - [Side bar](#side-bar)
@@ -81,8 +82,9 @@ The Shiny App is written in [Shiny](https://shiny.posit.co/) using [RStudio](htt
 
 ## Download the repository
 There are two ways to get the App: 
-1. Download my [GitHub repository](https://github.com/ivan-paleo/imaging-reports/archive/refs/heads/main.zip) or its latest [release](https://github.com/ivan-paleo/imaging-reports/releases) as a ZIP archive, and unzip it. You can access the repository with the source code by clicking on the button in the side bar of the APp (see [side bar](#side-bar)).  
+1. Download my [GitHub repository](https://github.com/ivan-paleo/imaging-reports/archive/refs/heads/main.zip) or its latest [release](https://github.com/ivan-paleo/imaging-reports/releases) as a ZIP archive, and unzip it. You can access the repository with the source code by clicking on the button in the side bar of the App (see [side bar](#side-bar)).  
 2. [Fork and clone](https://happygitwithr.com/fork-and-clone.html) my GitHub repository.
+
 
 ## Start the App
 1.  Open the file [imaging-reports.Rproj](imaging-reports.Rproj) with RStudio.
@@ -108,6 +110,11 @@ There are two ways to get the App:
 ></p>
 
 5.  Enter the information as explained in the following section ([Operating instructions](#operating-instructions)).
+
+
+## Save input
+**No input is saved in the App.** If you close the App (or the browser tab in case you opened it in your browser, see section [Start the App](#start-the-app)), all input will be deleted.  
+The only way to save input is by downloading the report to an ODS or XLSX file (see tab [Report](#tab-report)). Graphs in the tab [Objectives](#lateral-optical-resolution) can also be downloaded as PNG or PDF.
 
 
 ---
@@ -307,7 +314,8 @@ Pre-processing settings cannot be reported yet. WIP.
 **This tab shows a preview of the entered information.**  
 I recommend that you check that everything is correct before you download the report (see below).  
 As mentioned already [here](#introduction), it can be that some fields are not updated in this tab. In such cases, go back to the beginning ([side bar](#side-bar)) and follow the tabs from left ([General](#tab-general)) to right ([Pre-processing](#tab-pre-processing)).  
-Once done, click on the `Download Report to ODS` or `Download Report to XLSX` button at the bottom of the tab. Save the file to your computer; I recommend to use the name provided. **Check the file.**
+
+Once done, click on the `Download Report to ODS` or `Download Report to XLSX` button at the bottom of the tab. **Save the file to your computer**; I recommend to use the name provided. This is important as it is the only way to save your input (see section [Save input](#save-input)). **Check the file.**
 
 **Save one report for each instrument you used.**
 
