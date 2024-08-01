@@ -50,6 +50,9 @@ ui <- fluidPage(
                                icon = icon("github", lib = "font-awesome"),
                                onclick = "window.open('https://github.com/ivan-paleo/imaging-reports', '_blank')")),
 
+      # Version number / date - ADJUST WITH NEW VERSION / DATE
+      h5("v1.0 (2024-08-01"),
+
       # Set minimum size of elements in the sidebar
       tags$head(
         tags$style(type="text/css", "select { min-width: 350px; }"),
