@@ -102,7 +102,7 @@ There are two ways to get the App:
 >    <i>Run the App from within RStudio.</i>
 ></p>
 
-4.  The App will open in a new RStudio window. I recommend to open the App in your browser (click on `Open in Browser` at the top to open the App), and to maximize the window.
+4.  The App will open in a new RStudio window. I recommend to open the App in your browser (click on `Open in Browser` at the top to open the App), and to maximize the window (or at least make it large enough so that the fields do not overlap).
 
 ><p align="center" width="100%">
 >    <img src="screenshots/app_general_LSM_empty.png"><br>
@@ -126,7 +126,8 @@ The only way to save input is by downloading the report to an ODS or XLSX file (
 - Some information that will be included in the report (see tab [Report](#tab-report)) is hard coded and does not depend on your input because it depends on the hardware only. Because of that (and also developments and bug fixes), make sure you **use the latest version of the App**.  
 - **Every entered information summarizes all acquisitions about which you are reporting.** Therefore, do not fill the forms for every single acquisition bur rather for all acquisitions of a project. Metadata for every acquisition should be made accessible with the acquisition files themselves (see repo [publish-micro-image](https://github.com/ivan-paleo/publish-micro-image)).
 - While it is possible to jump from any tab to any other, conditional input (i.e. input based on other input) might not update correctly. Therefore, I recommend that you **start in the [side bar](#side-bar) and then fill in every tab from left (tab [General](#tab-general)) to right (tab [Pre-processing](#tab-pre-processing))**. The tab [Report](#tab-report) can be consulted any time to check how the output will look like, but you might get some errors until you have filled in all tabs.  
-- **You can save the settings for one instrument at a time.**  
+- Sometimes, you get error messages even when it should work. So **if an error message appears, (1) check whether you have entered the information required for a given tab to show properly** (e.g. if you have not entered information about the objectives, an error will appear in the tab Report in the section Objectives), **or (2) restart the App** (it often works!).
+- **You can create a report for one instrument at a time.**  
 - **Refer to the instrument's user manual if you need information about the settings.**
 
 
