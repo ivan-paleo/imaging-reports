@@ -9,9 +9,11 @@
 
 - [Purpose](#purpose)
 - [How to use the App](#how-to-use-the-app)
-    - [Pre-requisites](#pre-requisites)
-    - [Download the repository](#download-the-repository)
-    - [Start the App](#start-the-app)
+    - [On the LEIZA server](#on-the-leiza-server)
+    - [Locally with RStudio](#locally-with-rstudio)
+        - [Pre-requisites](#pre-requisites)
+        - [Download the repository](#download-the-repository)
+        - [Start the App](#start-the-app)
     - [Save input](#save-input)
 - [Operating instructions](#operating-instructions)
     - [Introduction](#introduction)
@@ -73,20 +75,25 @@ If you would like to adapt the App to your instrument(s), check the sections [Ho
 
 
 # How to use the App
-I am planning to make the App available online on a server, but the App can currently only be run locally.
 
+## On the LEIZA server
+**The easiest is to run the App on the LEIZA server:** https://tools.leiza.de/imaging-reports/ 
 
-## Pre-requisites
+## Locally with RStudio
+Alternatively, the App can also be run locally using RStudio.  
+This option is especially useful if you intend to edit the App (see sections [How to adapt the App](#how-to-adapt-the-app) and [How to contribute](#how-to-contribute)).
+
+### Pre-requisites
 The Shiny App is written in [Shiny](https://shiny.posit.co/) using [RStudio](https://posit.co/products/open-source/rstudio/), so you first need to download and install [R](https://www.r-project.org/) and [RStudio](https://posit.co/download/rstudio-desktop/). But fear not, **no knowledge of R/Rstudio is needed to run the App**!
 
 
-## Download the repository
+### Download the repository
 There are two ways to get the App: 
 1. Download my [GitHub repository](https://github.com/ivan-paleo/imaging-reports/archive/refs/heads/main.zip) or its latest [release](https://github.com/ivan-paleo/imaging-reports/releases) as a ZIP archive, and unzip it. You can access the repository with the source code by clicking on the button in the side bar of the App (see [side bar](#side-bar)).  
 2. [Fork and clone](https://happygitwithr.com/fork-and-clone.html) my GitHub repository.
 
 
-## Start the App
+### Start the App
 1.  Open the file [imaging-reports.Rproj](imaging-reports.Rproj) with RStudio.
 2.  Open the file `imaging-reports/app.R` from within RStudio by clicking on it in the `Files` panel.
 
@@ -113,7 +120,7 @@ There are two ways to get the App:
 
 
 ## Save input
-**No input is saved in the App.** If you close the App (or the browser tab in case you opened it in your browser, see section [Start the App](#start-the-app)), all input will be deleted.  
+**In both cases (LEIZA server and local), no input is saved in the App.** If you close the App (or the browser tab), all input will be deleted.  
 The only way to save input is by downloading the report to an ODS or XLSX file (see tab [Report](#tab-report)). Graphs in the tab [Objectives](#lateral-optical-resolution) can also be downloaded as PNG or PDF.
 
 

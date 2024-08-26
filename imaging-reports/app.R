@@ -51,7 +51,7 @@ ui <- fluidPage(
                                onclick = "window.open('https://github.com/ivan-paleo/imaging-reports', '_blank')")),
 
       # Version number / date - ADJUST WITH NEW VERSION / DATE
-      h5("v1.0 (2024-08-01)"),
+      h5("v1.0 (2024-08-26)"),
 
       # Set minimum size of elements in the sidebar
       tags$head(
