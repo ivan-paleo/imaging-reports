@@ -26,7 +26,7 @@ library(tidyverse)
 ui <- fluidPage(
 
   # 2.1. Application title
-  titlePanel("Create a report for your microscope images acquired at the Imaging Platform At LEIZA (IMPALA)"),
+  titlePanel("Create a report for your microscope images acquired at the TraCEr lab / IMPALA (LEIZA)"),
 
   sidebarLayout(
 
@@ -40,27 +40,32 @@ ui <- fluidPage(
       selectInput("instrument", "Choose the instrument",
                   c("Axio Imager.Z2 Vario + LSM 800 MAT", "Smartzoom 5", "Axio Scope.A1", "Axio Lab.A1")),
 
+      # Separator line
+      hr(style = "border-top: 1px solid #000000;"),
+
       # LEIZA logo
       img(src = "Leiza_Logo_Deskriptor_CMYK_rot_LEIZA.png", height = 150),
 
-      # Credit
-      splitLayout(cellWidths = c("50%", "50%"),
-                  h5("By Ivan Calandra"),
+      # Separator line
+      hr(style = "border-top: 1px solid #000000;"),
+
+      # GitHub
+      splitLayout(cellWidths = c("40%", "60%"),
                   actionButton("GitHub", "imaging-reports",
                                icon = icon("github", lib = "font-awesome"),
-                               onclick = "window.open('https://github.com/ivan-paleo/imaging-reports', '_blank')")),
+                               onclick = "window.open('https://github.com/ivan-paleo/imaging-reports', '_blank')"),
+                  h5(HTML("&#129152; Infos and help"))
+      ),
 
       # Version number / date - ADJUST WITH NEW VERSION / DATE
-      h5("v1.0 (2024-08-26)"),
+      # Credits
+      splitLayout(cellWidths = c("50%", "50%"),
+                  h5("v1.1 (2026-07-14)"),
+                  h5("By Ivan Calandra")
+      ),
 
-      # Set minimum size of elements in the sidebar
-      tags$head(
-        tags$style(type="text/css", "select { min-width: 350px; }"),
-        tags$style(type="text/css", ".span4 { min-width: 350px; }"),
-        tags$style(type="text/css", "textarea { min-width: 350px; }"),
-        tags$style(type="text/css", ".jslider { min-width: 350px; }"),
-        tags$style(type="text/css", ".well { min-width: 350px; }")
-      )
+      # Width of the sidebar (default = 2)
+      width = 3
     ),
 
     # 2.3. Main panel
@@ -130,7 +135,7 @@ server <- function(input, output) {
 
     # Axio Scope.A1 and Axio Lab.A1
     if (input$instrument %in% c("Axio Scope.A1", "Axio Lab.A1")) {
-      soft <- c("ZEN core", "Helicon Focus")
+      soft <- c("ZEN core", "ZEN blue", "Helicon Focus")
       acq_modes <- c("2D", "EDF", "Panorama")
     }
 
@@ -235,7 +240,6 @@ server <- function(input, output) {
 
     # Define objectives and settings for Axio Scope.A1 and Axio Lab.A1
     if (input$instrument %in% c("Axio Scope.A1", "Axio Lab.A1")) {
-      obj_mag <- c("5x", "10x", "20x", "50x")
       obj_use <- c("Color image", "Not used")
       sel_multi <- FALSE
       sel_value <- "Not used"
@@ -245,6 +249,7 @@ server <- function(input, output) {
 
     # Define objectives and settings for Axio Scope.A1
     if (input$instrument == "Axio Scope.A1") {
+      obj_mag <- c("5x", "10x", "20x", "50x")
       obj_na <- c(0.13, 0.25, 0.40, 0.75)
       assign("obj_Kna", 0.61/obj_na, envir = .GlobalEnv)
       assign("objectives",
@@ -254,10 +259,14 @@ server <- function(input, output) {
 
     # Define objectives and settings for Axio Lab.A1
     if (input$instrument == "Axio Lab.A1") {
-      obj_na <- c(0.15, 0.25, 0.45, 0.80)
+      obj_mag <- c("5x", "10x", "20x", "50x", "100x")
+      obj_na <- c(0.15, 0.25, 0.45, 0.80, 1.25)
       assign("obj_Kna", 0.61/obj_na, envir = .GlobalEnv)
       assign("objectives",
-             paste0("N-Achroplan Pol ", obj_mag, " / NA = ", obj_na, " / WD = ", c(12, 6.5, 0.63, 0.41), " mm"),
+             c(paste0("N-Achroplan Pol ", obj_mag[-5],
+                      " / NA = ", obj_na[-5],
+                      " / WD = ", c(12, 6.5, 0.63, 0.41), " mm"),
+               "N-Achroplan 100x / NA = 1.25 / oil"),
              envir = .GlobalEnv)
     }
 

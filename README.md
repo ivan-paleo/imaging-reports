@@ -59,7 +59,7 @@
 
 # Purpose
 
-This repository contains a [**Shiny App**](imaging-reports/app.R) that guides users to **create a report for microscope images acquired at the Imaging Platform at LEIZA ([IMPALA](https://www.leiza.de/forschung/infrastrukturen/labore/impala)) with all the necessary metadata.**
+This repository contains a [**Shiny App**](imaging-reports_App/app.R) that guides users to **create a report for microscope images acquired at the [TraCEr lab](https://www.leiza.de/forschung/infrastrukturen/labore/tracer) / Imaging Platform at LEIZA ([IMPALA](https://www.leiza.de/forschung/infrastrukturen/labore/impala)) with all the necessary metadata.**
 
 Once all fields are entered, **the report can be exported to an ODS or XLSX file**.  
 
@@ -95,7 +95,7 @@ There are two ways to get the App:
 
 ### Start the App
 1.  Open the file [imaging-reports.Rproj](imaging-reports.Rproj) with RStudio.
-2.  Open the file `imaging-reports/app.R` from within RStudio by clicking on it in the `Files` panel.
+2.  Open the file `imaging-reports_App/app.R` from within RStudio by clicking on it in the `Files` panel.
 
 ><p align="center" width="100%">
 >    <img src="screenshots/open_app.png"><br>
